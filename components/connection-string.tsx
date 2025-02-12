@@ -5,58 +5,40 @@ import { JetstreamConfig } from '@/types/jetstream'
 
 export function ConnectionString({ options }: { options: JetstreamConfig }) {
   const connectionStrings = buildConnectionString(options)
+
   return (
-    <Card className="p-4 space-y-4">
-      <h2 className="font-semibold">Connection string</h2>
+    <Card className="p-6">
+      <div className="space-y-4">
+        <h2 className="font-semibold">Connection string</h2>
 
-      <Tabs defaultValue="raw" className="space-y-2">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="raw">Raw URL</TabsTrigger>
-          <TabsTrigger value="websocat">Websocat</TabsTrigger>
-          <TabsTrigger value="javascript">JavaScript</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="raw" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="raw">Raw URL</TabsTrigger>
+            <TabsTrigger value="websocat">Websocat</TabsTrigger>
+            <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="raw" className="space-y-2">
-          <div className="flex items-center justify-between space-x-2">
-            <pre className="flex-1 text-xs bg-muted p-3 rounded-md overflow-x-auto font-mono">
-              <code>{connectionStrings.raw}</code>
-            </pre>
-            <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(connectionStrings.raw)}>
-              copy
-            </Button>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="websocat" className="space-y-2">
-          <div className="flex items-center justify-between space-x-2">
-            <pre className="flex-1 text-xs bg-muted p-3 rounded-md overflow-x-auto font-mono">
-              <code>{connectionStrings.websocat}</code>
-            </pre>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigator.clipboard.writeText(connectionStrings.websocat)}
-            >
-              copy
-            </Button>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="javascript" className="space-y-2">
-          <div className="flex items-center justify-between space-x-2">
-            <pre className="flex-1 text-xs bg-muted p-3 rounded-md overflow-x-auto font-mono">
-              <code>{connectionStrings.javascript}</code>
-            </pre>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigator.clipboard.writeText(connectionStrings.javascript)}
-            >
-              copy
-            </Button>
-          </div>
-        </TabsContent>
-      </Tabs>
+          {['raw', 'websocat', 'javascript'].map((tab) => (
+            <TabsContent key={tab} value={tab} className="space-y-2">
+              <div className="relative">
+                <pre className="text-xs bg-muted/50 p-4 rounded-lg overflow-x-auto font-mono">
+                  <code>{connectionStrings[tab as keyof typeof connectionStrings]}</code>
+                </pre>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="absolute top-2 right-2"
+                  onClick={() =>
+                    navigator.clipboard.writeText(connectionStrings[tab as keyof typeof connectionStrings])
+                  }
+                >
+                  Copy
+                </Button>
+              </div>
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
     </Card>
   )
 }

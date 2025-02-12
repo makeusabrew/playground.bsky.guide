@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { JetstreamConfig } from '@/types/jetstream'
+import { Badge } from '@/components/ui/badge'
 
 interface ConnectionConfigProps {
   isConnected: boolean
@@ -15,18 +16,18 @@ interface ConnectionConfigProps {
 
 export default function ConnectionConfig({ isConnected, options, setOptions, setIsConnected }: ConnectionConfigProps) {
   return (
-    <Card className="p-4 space-y-4">
-      <div className="space-y-2">
+    <Card className="p-6">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Connection settings</h2>
-          <p className="text-sm text-muted-foreground">Status: {isConnected ? 'Connected' : 'Disconnected'}</p>
+          <Badge variant={isConnected ? 'default' : 'secondary'}>{isConnected ? 'Connected' : 'Disconnected'}</Badge>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Instance</Label>
+        <div className="space-y-5">
+          <div className="space-y-2.5">
+            <Label className="text-sm">Instance</Label>
             <Select
-              value="jetstream1.us-east.bsky.network"
+              value={options.instance}
               onValueChange={(value) => {
                 setOptions({
                   ...options,
@@ -46,9 +47,10 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label>Wanted collections</Label>
+          <div className="space-y-2.5">
+            <Label className="text-sm">Wanted collections</Label>
             <Input
+              className="font-mono text-sm"
               placeholder="app.bsky.feed.post,app.bsky.feed.like"
               value={options.collections}
               onChange={(e) =>
@@ -61,9 +63,10 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
             <p className="text-xs text-muted-foreground">Comma-separated list of collections</p>
           </div>
 
-          <div className="space-y-2">
-            <Label>Wanted DIDs</Label>
+          <div className="space-y-2.5">
+            <Label className="text-sm">Wanted DIDs</Label>
             <Input
+              className="font-mono text-sm"
               placeholder="did:plc:1234,did:plc:5678"
               value={options.dids}
               onChange={(e) =>
@@ -76,9 +79,10 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
             <p className="text-xs text-muted-foreground">Comma-separated list of DIDs (max 10,000)</p>
           </div>
 
-          <div className="space-y-2">
-            <Label>Cursor (microseconds)</Label>
+          <div className="space-y-2.5">
+            <Label className="text-sm">Cursor (microseconds)</Label>
             <Input
+              className="font-mono text-sm"
               placeholder="1725519626134432"
               value={options.cursor || ''}
               onChange={(e) =>
@@ -116,7 +120,7 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
           <Button
             className="w-full"
             onClick={() => setIsConnected(!isConnected)}
-            variant={isConnected ? 'secondary' : 'default'}
+            variant={isConnected ? 'destructive' : 'default'}
           >
             {isConnected ? 'Disconnect' : 'Connect'}
           </Button>
