@@ -1,8 +1,6 @@
 'use client'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
-import MetricsDisplay from '@/components/metrics-display'
 import { JetstreamProvider } from '@/app/context/JetstreamContext'
 import { useState } from 'react'
 
@@ -29,23 +27,10 @@ export default function Home() {
             </div>
 
             <JetstreamProvider {...config}>
-              <Tabs defaultValue="stream" className="space-y-4">
-                <TabsList>
-                  <TabsTrigger value="stream">Stream viewer</TabsTrigger>
-                  <TabsTrigger value="metrics">Metrics</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="stream" className="space-y-4">
-                  <div className="grid gap-4 md:grid-cols-[400px_1fr]">
-                    <ConnectionConfig />
-                    <StreamViewer />
-                  </div>
-                </TabsContent>
-
-                <TabsContent value="metrics">
-                  <MetricsDisplay />
-                </TabsContent>
-              </Tabs>
+              <div className="space-y-6">
+                <ConnectionConfig />
+                <StreamViewer />
+              </div>
             </JetstreamProvider>
           </div>
         </div>

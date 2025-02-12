@@ -42,34 +42,32 @@ export default function StreamViewer() {
   }
 
   return (
-    <div className="w-full">
-      <Card className="h-[600px] flex flex-col max-w-[400px]">
-        <div className="p-4 border-b flex-none">
-          <h2 className="font-semibold">Raw output</h2>
-        </div>
+    <Card className="h-[600px] flex flex-col">
+      <div className="p-4 border-b flex-none">
+        <h2 className="font-semibold">Raw output</h2>
+      </div>
 
-        <div
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto p-4"
-          onScroll={handleScroll}
-          onWheel={handleWheel}
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleInteractionEnd}
-          onWheelCapture={handleInteractionEnd}
-        >
-          {messages.length === 0 ? (
-            <div className="text-xs text-muted-foreground">Waiting for connection...</div>
-          ) : (
-            <div className="space-y-2">
-              {messages.map((msg, i) => (
-                <div key={i} className="text-xs border-b pb-2">
-                  <div className="font-mono whitespace-nowrap min-w-fit">{msg}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </Card>
-    </div>
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-4"
+        onScroll={handleScroll}
+        onWheel={handleWheel}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleInteractionEnd}
+        onWheelCapture={handleInteractionEnd}
+      >
+        {messages.length === 0 ? (
+          <div className="text-xs text-muted-foreground">Waiting for connection...</div>
+        ) : (
+          <div className="space-y-2">
+            {messages.map((msg, i) => (
+              <div key={i} className="text-xs border-b pb-2">
+                <div className="font-mono whitespace-nowrap min-w-fit">{msg}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </Card>
   )
 }
