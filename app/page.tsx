@@ -1,20 +1,10 @@
 'use client'
 import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
-import { JetstreamProvider } from '@/app/context/JetstreamContext'
-import { useState } from 'react'
 import MetricsDisplay from '@/components/metrics-display'
+import { JetstreamProvider } from '@/app/context/JetstreamContext'
 
 export default function Home() {
-  const [config, setConfig] = useState({
-    instance: 'jetstream2.us-east.bsky.network',
-    collections: '',
-    dids: '',
-    cursor: '',
-    // compression: false,
-    messageLimit: '1000',
-  })
-
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
@@ -27,7 +17,7 @@ export default function Home() {
               </p>
             </div>
 
-            <JetstreamProvider {...config}>
+            <JetstreamProvider>
               <div className="space-y-6">
                 <ConnectionConfig />
                 <MetricsDisplay />

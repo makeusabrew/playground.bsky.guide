@@ -21,6 +21,7 @@ type ConsumerState = {
 }
 
 export const createJetstreamConsumer = (options: ConsumerOptions) => {
+  console.log(`createJetstreamConsumer options`, options)
   let state: ConsumerState = {
     status: 'disconnected',
     intentionalDisconnect: false,
@@ -112,7 +113,9 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
     }
 
     const queryString = params.toString()
-    return `wss://${options.instance}/subscribe${queryString ? '?' + queryString : ''}`
+    const url = `wss://${options.instance}/subscribe${queryString ? '?' + queryString : ''}`
+    console.log(`buildConnectionUrl`, url)
+    return url
   }
 
   const updateState = (newState: Partial<ConsumerState>) => {

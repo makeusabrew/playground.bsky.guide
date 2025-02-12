@@ -1,15 +1,42 @@
 'use client'
-import { createContext, useContext, ReactNode } from 'react'
+import { createContext, useContext, ReactNode, useState } from 'react'
 import { useJetstream } from '@/app/hooks/use-jetstream'
 
-const JetstreamContext = createContext<ReturnType<typeof useJetstream> | null>(null)
+type JetstreamConfig = {
+  instance: string
+  collections: string
+  dids: string
+  cursor: string
+  messageLimit: string
+}
 
-export function JetstreamProvider({
-  children,
-  ...options
-}: { children: ReactNode } & Parameters<typeof useJetstream>[0]) {
-  const jetstream = useJetstream(options)
-  return <JetstreamContext.Provider value={jetstream}>{children}</JetstreamContext.Provider>
+type JetstreamContextType = ReturnType<typeof useJetstream> & {
+  config: JetstreamConfig
+  updateConfig: (updates: Partial<JetstreamConfig>) => void
+}
+
+const defaultConfig: JetstreamConfig = {
+  instance: 'jetstream1.us-east.bsky.network',
+  collections: '',
+  dids: '',
+  cursor: '',
+  messageLimit: '1000',
+}
+
+const JetstreamContext = createContext<JetstreamContextType | null>(null)
+
+export function JetstreamProvider({ children }: { children: ReactNode }) {
+  const [config, setConfig] = useState<JetstreamConfig>(defaultConfig)
+
+  const jetstream = useJetstream(config)
+
+  const updateConfig = (updates: Partial<JetstreamConfig>) => {
+    setConfig((prev) => ({ ...prev, ...updates }))
+  }
+
+  return (
+    <JetstreamContext.Provider value={{ ...jetstream, config, updateConfig }}>{children}</JetstreamContext.Provider>
+  )
 }
 
 export function useJetstreamContext() {

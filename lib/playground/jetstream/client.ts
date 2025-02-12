@@ -17,6 +17,7 @@ type WebSocketClientState = {
 }
 
 export const createWebSocketClient = (options: WebSocketClientOptions) => {
+  console.log(`createWebSocketClient options`, options.url)
   let ws: WebSocket | null = null
   let state: WebSocketClientState = {
     isConnected: false,
@@ -28,6 +29,7 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
   const connect = () => {
     if (ws?.readyState === WebSocket.OPEN) return
 
+    console.log(`connecting to ${options.url}`)
     ws = new WebSocket(options.url)
 
     ws.onopen = () => {
