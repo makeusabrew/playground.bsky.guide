@@ -22,7 +22,7 @@ function getRateColor(rate: number): string {
 
 export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics }) {
   return (
-    <div className="p-6">
+    <div className="p-3">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Real-time metrics</h2>

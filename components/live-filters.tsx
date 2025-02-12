@@ -62,7 +62,7 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
   }
 
   return (
-    <div className="px-6">
+    <div className="px-3">
       <div className="space-y-6">
         <div className="space-y-2">
           <h2 className="font-semibold flex items-center gap-2">

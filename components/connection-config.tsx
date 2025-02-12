@@ -15,7 +15,7 @@ interface ConnectionConfigProps {
 
 export default function ConnectionConfig({ isConnected, options, setOptions, setIsConnected }: ConnectionConfigProps) {
   return (
-    <div className="p-6">
+    <div className="p-3">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Connection settings</h2>

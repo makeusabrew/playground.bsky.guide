@@ -133,14 +133,14 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
 
   return (
     <div className="h-[600px] flex flex-col">
-      <div className="p-4 border-b flex-none flex items-center gap-2">
+      <div className="p-3 border-b flex-none flex items-center gap-2">
         <PlayCircle size={16} className="text-muted-foreground" />
         <h2 className="font-semibold">Real-time message stream</h2>
       </div>
 
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4"
+        className="flex-1 overflow-y-auto p-3"
         onScroll={handleScroll}
         onWheel={handleWheel}
         onTouchStart={handleTouchStart}
