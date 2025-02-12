@@ -61,7 +61,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
 
         <div className="space-y-3">
           <h2 className="font-semibold text-sm">Collections</h2>
-          <ScrollArea className="h-[200px]">
+          <ScrollArea className="h-[300px]">
             <div className="space-y-0">
               {Object.entries(metrics.messagesByCollection)
                 .sort(([, a], [, b]) => b - a)

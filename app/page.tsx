@@ -91,7 +91,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="md:col-span-1">
                 <ConnectionConfig
                   isConnected={isConnected}
@@ -100,19 +100,19 @@ export default function Home() {
                   setIsConnected={setIsConnected}
                 />
               </Card>
-              <Card className="md:col-span-2">
+              <Card className="md:col-span-1">
                 <ConnectionString options={connectionOptions} />
-                <MetricsDisplay metrics={metrics} />
+                <LiveFilters filters={filters} onFiltersChange={setFilters} />
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-1">
-                <LiveFilters filters={filters} onFiltersChange={setFilters} />
-              </div>
-              <div className="md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+              <Card className="md:col-span-2">
+                <MetricsDisplay metrics={metrics} />
+              </Card>
+              <Card className="md:col-span-3">
                 <StreamViewer messages={filteredMessages} />
-              </div>
+              </Card>
             </div>
           </div>
         </div>

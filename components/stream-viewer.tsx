@@ -87,7 +87,7 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
   }
 
   return (
-    <Card className="h-[600px] flex flex-col">
+    <div className="h-[600px] flex flex-col">
       <div className="p-4 border-b flex-none flex items-center justify-between">
         <h2 className="font-semibold">Raw output</h2>
       </div>
@@ -128,6 +128,6 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
           </div>
         )}
       </div>
-    </Card>
+    </div>
   )
 }

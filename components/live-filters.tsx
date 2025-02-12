@@ -39,7 +39,7 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
   }
 
   return (
-    <Card className="p-6">
+    <div className="px-6">
       <div className="space-y-6">
         <div className="space-y-2">
           <h2 className="font-semibold">Live filters</h2>
@@ -145,6 +145,6 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   )
 }
