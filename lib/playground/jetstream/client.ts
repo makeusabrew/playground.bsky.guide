@@ -1,9 +1,9 @@
 type WebSocketClientOptions = {
   url: string
-  onMessage?: (data: string) => void
-  onError?: (error: Error) => void
-  onClose?: () => void
-  onOpen?: () => void
+  onMessage: (data: string) => void
+  onError: (error: Error) => void
+  onClose: () => void
+  onOpen: () => void
   autoReconnect?: boolean
   maxReconnectAttempts?: number
   reconnectDelay?: number
@@ -25,10 +25,12 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
 
   const getState = () => ({ ...state })
 
-  const connect = () => {
+  const connect = (cursor?: number) => {
     if (ws?.readyState === WebSocket.OPEN) return
 
-    ws = new WebSocket(options.url)
+    // FIXME: this is a bodge; cursor should be baked into the original URL
+    const separator = options.url.includes('?') ? '&' : '?'
+    ws = new WebSocket(`${options.url}${separator}${cursor ? `cursor=${cursor}` : ''}`)
 
     ws.onopen = () => {
       state = {
@@ -36,7 +38,7 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
         isConnected: true,
         reconnectAttempts: 0,
       }
-      options.onOpen?.()
+      options.onOpen()
     }
 
     ws.onmessage = (event) => {
@@ -48,12 +50,12 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
           lastCursor: data.time_us,
         }
       }
-      options.onMessage?.(event.data)
+      options.onMessage(event.data)
     }
 
     ws.onerror = (error: Event) => {
       console.warn(`WebSocket error: ${error}`)
-      options.onError?.(new Error('WebSocket error'))
+      options.onError(new Error('WebSocket error'))
     }
 
     ws.onclose = () => {
@@ -61,7 +63,7 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
         ...state,
         isConnected: false,
       }
-      options.onClose?.()
+      options.onClose()
 
       if (
         options.autoReconnect &&

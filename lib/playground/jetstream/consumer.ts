@@ -36,9 +36,9 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
     if (options.dids?.length) {
       options.dids.forEach((d) => params.append('wantedDids', d))
     }
-    if (options.cursor || state.cursor) {
-      params.append('cursor', String(options.cursor || state.cursor))
-    }
+    // if (options.cursor || state.cursor) {
+    //   params.append('cursor', String(options.cursor || state.cursor))
+    // }
     if (options.compression) {
       params.append('compress', 'true')
     }
@@ -84,9 +84,9 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
   })
 
   const start = () => {
-    updateState({ status: 'connecting', intentionalDisconnect: false })
     options.metricsManager.reset()
-    wsClient.connect()
+    updateState({ status: 'connecting', intentionalDisconnect: false })
+    wsClient.connect(options.cursor)
   }
 
   const pause = () => {
@@ -95,9 +95,8 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
   }
 
   const resume = () => {
-    if (state.status === 'paused') {
-      start()
-    }
+    updateState({ status: 'connecting', intentionalDisconnect: false })
+    wsClient.connect(state.cursor || options.cursor)
   }
 
   const updateOptions = (newOptions: Partial<ConsumerOptions>) => {

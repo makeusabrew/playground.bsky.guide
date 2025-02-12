@@ -64,6 +64,10 @@ export const useJetstream = (options: JetstreamConfig) => {
     consumer.start()
   }, [consumer])
 
+  const resume = useCallback(() => {
+    consumer.resume()
+  }, [consumer])
+
   const disconnect = useCallback(() => {
     consumer.pause()
   }, [consumer])
@@ -74,6 +78,7 @@ export const useJetstream = (options: JetstreamConfig) => {
     messages,
     metrics,
     connect,
+    resume,
     disconnect,
   }
 }

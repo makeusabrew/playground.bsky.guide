@@ -5,15 +5,25 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { JetstreamConfig } from '@/types/jetstream'
 import { Badge } from '@/components/ui/badge'
+import { PauseCircle, PlayCircle, RotateCcw } from 'lucide-react'
+import { ConnectionState } from '@/app/page'
 
 interface ConnectionConfigProps {
-  isConnected: boolean
-  setIsConnected: (isConnected: boolean) => void
+  hasEverConnected: boolean
+  connectionState: ConnectionState
+  setConnectionState: (connectionState: ConnectionState) => void
   options: JetstreamConfig
   setOptions: (options: JetstreamConfig) => void
 }
 
-export default function ConnectionConfig({ isConnected, options, setOptions, setIsConnected }: ConnectionConfigProps) {
+export default function ConnectionConfig({
+  hasEverConnected,
+  connectionState,
+  setConnectionState,
+  options,
+  setOptions,
+}: ConnectionConfigProps) {
+  const isConnected = connectionState.connected
   return (
     <div className="p-3">
       <div className="space-y-6">
@@ -116,13 +126,48 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
             <Label htmlFor="compression">enable compression</Label>
           </div> */}
 
-          <Button
-            className="w-full"
-            onClick={() => setIsConnected(!isConnected)}
-            variant={isConnected ? 'destructive' : 'default'}
-          >
-            {isConnected ? 'Disconnect' : 'Connect'}
-          </Button>
+          {isConnected ? (
+            <Button
+              className="w-full flex items-center gap-2"
+              onClick={() => setConnectionState({ connected: false, mode: 'restart' })}
+              variant="secondary"
+            >
+              <PauseCircle className="w-4 h-4" />
+              Disconnect
+            </Button>
+          ) : (
+            <>
+              {hasEverConnected ? (
+                <div className="gap-2 flex">
+                  <Button
+                    className="w-full flex items-center gap-2"
+                    onClick={() => setConnectionState({ connected: true, mode: 'resume' })}
+                    variant="outline"
+                  >
+                    <PlayCircle className="w-4 h-4" />
+                    Resume
+                  </Button>
+                  <Button
+                    className="w-full flex items-center gap-2"
+                    onClick={() => setConnectionState({ connected: true, mode: 'restart' })}
+                    variant="secondary"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Restart
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  className="w-full flex items-center gap-2"
+                  onClick={() => setConnectionState({ connected: true, mode: 'restart' })}
+                  variant="default"
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  Connect
+                </Button>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

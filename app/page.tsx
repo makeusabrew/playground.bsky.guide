@@ -10,8 +10,17 @@ import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
 import LiveFilters, { FilterOptions, COMMON_COLLECTIONS } from '@/components/live-filters'
 
+export type ConnectionState = {
+  connected: boolean
+  mode: 'resume' | 'restart'
+}
+
 export default function Home() {
-  const [isConnected, setIsConnected] = useState(false)
+  const [hasEverConnected, setHasEverConnected] = useState(false)
+  const [connectionState, setConnectionState] = useState<ConnectionState>({
+    connected: false,
+    mode: 'restart',
+  })
   const [showShimmer, setShowShimmer] = useState(true)
   const [connectionOptions, setConnectionOptions] = useState<JetstreamConfig>({
     // Default options here
@@ -35,13 +44,18 @@ export default function Home() {
   const jetstream = useJetstream(connectionOptions)
 
   useEffect(() => {
-    if (isConnected) {
-      jetstream.connect()
+    if (connectionState.connected) {
+      if (connectionState.mode === 'restart') {
+        jetstream.connect()
+      } else {
+        jetstream.resume()
+      }
       setShowShimmer(false)
+      setHasEverConnected(true)
     } else {
       jetstream.disconnect()
     }
-  }, [isConnected])
+  }, [connectionState])
 
   // Remove shimmer after 5 seconds if user hasn't connected
   useEffect(() => {
@@ -105,14 +119,15 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <Card className={`md:col-span-2 ${showShimmer ? 'animate-shimmer' : ''}`}>
               <ConnectionConfig
-                isConnected={isConnected}
+                hasEverConnected={hasEverConnected}
+                connectionState={connectionState}
+                setConnectionState={setConnectionState}
                 options={connectionOptions}
                 setOptions={setConnectionOptions}
-                setIsConnected={setIsConnected}
               />
             </Card>
             <Card className="md:col-span-3">
-              <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!isConnected} />
+              <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
               <ConnectionString options={connectionOptions} />
             </Card>
           </div>
