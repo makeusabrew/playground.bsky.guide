@@ -28,6 +28,8 @@ const JetstreamContext = createContext<JetstreamContextType | null>(null)
 export function JetstreamProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<JetstreamConfig>(defaultConfig)
 
+  console.log(`JetstreamProvider configC`)
+
   const jetstream = useJetstream(config)
 
   const updateConfig = (updates: Partial<JetstreamConfig>) => {
