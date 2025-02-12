@@ -5,7 +5,6 @@ import StreamViewer from '@/components/stream-viewer'
 import MetricsDisplay from '@/components/metrics-display'
 import { JetstreamConfig } from '@/types/jetstream'
 import { useJetstream } from './hooks/use-jetstream'
-import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
 import LiveFilters, { FilterOptions, COMMON_COLLECTIONS } from '@/components/live-filters'
@@ -91,19 +90,6 @@ export default function Home() {
     return true
   })
 
-  // FIXME: need to build a new object otherwise the metrics display doesn't re-render
-  const metrics: JetstreamMetrics = {
-    totalMessages: jetstream.metrics.totalMessages,
-    messagesPerSecond: jetstream.metrics.messagesPerSecond,
-    totalCreates: jetstream.metrics.totalCreates,
-    createPerSecond: jetstream.metrics.createPerSecond,
-    totalDeletes: jetstream.metrics.totalDeletes,
-    deletePerSecond: jetstream.metrics.deletePerSecond,
-    messagesByCollection: jetstream.metrics.messagesByCollection,
-    collectionRates: jetstream.metrics.collectionRates,
-    lastUpdate: jetstream.metrics.lastUpdate,
-  }
-
   return (
     <main className="flex-1">
       <div className="container mx-auto p-4 max-w-7xl">
@@ -136,7 +122,7 @@ export default function Home() {
                 <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
               </Card>
               <Card>
-                <MetricsDisplay metrics={metrics} />
+                <MetricsDisplay messages={jetstream.messages} />
               </Card>
             </div>
           </div>

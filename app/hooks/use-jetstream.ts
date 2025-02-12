@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import { createJetstreamConsumer } from '@/lib/playground/jetstream/consumer'
-import { createMetricsManager } from '@/lib/playground/jetstream/metrics-manager'
-import type { JetstreamEvent, JetstreamMetrics } from '@/lib/playground/jetstream/types'
+import type { JetstreamEvent } from '@/lib/playground/jetstream/types'
 import { JetstreamConfig } from '@/types/jetstream'
 
 type JetstreamStatus = 'disconnected' | 'connecting' | 'connected' | 'paused'
@@ -10,17 +9,6 @@ export const useJetstream = (options: JetstreamConfig) => {
   const [status, setStatus] = useState<JetstreamStatus>('disconnected')
   const [error, setError] = useState<Error | undefined>()
   const [messages, setMessages] = useState<JetstreamEvent[]>([])
-  const [metrics, setMetrics] = useState<JetstreamMetrics>({
-    totalMessages: 0,
-    messagesByCollection: {},
-    totalCreates: 0,
-    totalDeletes: 0,
-    messagesPerSecond: 0,
-    createPerSecond: 0,
-    deletePerSecond: 0,
-    collectionRates: {},
-    lastUpdate: Date.now(),
-  })
 
   // Parse message limit with fallback
   const limit = Math.max(1, Math.min(100000, parseInt(options.messageLimit || '1000', 10)))
@@ -35,15 +23,12 @@ export const useJetstream = (options: JetstreamConfig) => {
     .map((d) => d.trim())
     .filter(Boolean)
 
-  const metricsManager = createMetricsManager((newMetrics) => setMetrics(newMetrics))
-
   const consumer = createJetstreamConsumer({
     instance: options.instance,
     collections,
     dids,
     cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
     compression: false,
-    metricsManager,
     onMessage: (event) => {
       setMessages((prev) => {
         const newMessages = [...prev, event]
@@ -76,7 +61,6 @@ export const useJetstream = (options: JetstreamConfig) => {
     status,
     error,
     messages,
-    metrics,
     connect,
     resume,
     disconnect,

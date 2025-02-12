@@ -1,6 +1,5 @@
 import type { JetstreamEvent } from './types'
 import { createWebSocketClient } from './client'
-import type { MetricsManager } from './metrics-manager'
 
 type ConsumerOptions = {
   instance: string
@@ -8,7 +7,6 @@ type ConsumerOptions = {
   dids?: string[]
   cursor?: number
   compression?: boolean
-  metricsManager: MetricsManager
   onMessage: (event: JetstreamEvent) => void
   onError?: (error: Error) => void
   onStateChange?: (state: ConsumerState) => void
@@ -61,7 +59,6 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
       try {
         const event = JSON.parse(data) as JetstreamEvent
         updateState({ cursor: event.time_us })
-        options.metricsManager.updateMetrics(event)
         options.onMessage(event)
       } catch (err: unknown) {
         console.error(`Failed to parse Jetstream event`, err)
@@ -84,7 +81,6 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
   })
 
   const start = () => {
-    options.metricsManager.reset()
     updateState({ status: 'connecting', intentionalDisconnect: false })
     wsClient.connect(options.cursor)
   }
@@ -114,6 +110,5 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
     resume,
     updateOptions,
     getState: () => ({ ...state }),
-    getMetrics: () => options.metricsManager.getMetrics(),
   }
 }

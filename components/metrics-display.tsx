@@ -1,8 +1,10 @@
 'use client'
-import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
+import { JetstreamEvent } from '@/lib/playground/jetstream/types'
 import { Badge } from './ui/badge'
 import { ScrollArea } from './ui/scroll-area'
 import { Activity } from 'lucide-react'
+import { useMetrics } from '@/app/hooks/use-metrics'
+
 function formatNumber(num: number): string {
   if (num === 0) return '0'
   if (num >= 1000) return `${(num / 1000).toFixed(1)}k`
@@ -20,7 +22,9 @@ function getRateColor(rate: number): string {
   return 'text-muted-foreground'
 }
 
-export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics }) {
+export default function MetricsDisplay({ messages }: { messages: JetstreamEvent[] }) {
+  const metrics = useMetrics(messages)
+
   return (
     <div className="p-3">
       <div className="space-y-4">
