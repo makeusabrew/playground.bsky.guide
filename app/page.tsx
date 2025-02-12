@@ -3,6 +3,7 @@ import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
 import { JetstreamProvider } from '@/app/context/JetstreamContext'
 import { useState } from 'react'
+import MetricsDisplay from '@/components/metrics-display'
 
 export default function Home() {
   const [config, setConfig] = useState({
@@ -29,6 +30,7 @@ export default function Home() {
             <JetstreamProvider {...config}>
               <div className="space-y-6">
                 <ConnectionConfig />
+                <MetricsDisplay />
                 <StreamViewer />
               </div>
             </JetstreamProvider>

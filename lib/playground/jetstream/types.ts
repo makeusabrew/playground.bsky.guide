@@ -120,3 +120,25 @@ export interface AccountEvent extends BaseEvent {
 }
 
 export type JetstreamEvent = CommitEvent | IdentityEvent | AccountEvent
+
+export type JetstreamMetrics = {
+  // Totals
+  totalMessages: number
+  messagesByCollection: Record<string, number>
+  totalCreates: number
+  totalDeletes: number
+
+  // Rates (per second)
+  messagesPerSecond: number
+  createPerSecond: number
+  deletePerSecond: number
+  collectionRates: Record<string, number>
+
+  // For rate calculations
+  lastUpdate: number
+}
+
+export type MetricsUpdate = {
+  type: 'metrics'
+  metrics: JetstreamMetrics
+}
