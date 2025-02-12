@@ -80,43 +80,41 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1">
-        <div className="container mx-auto p-6 max-w-7xl">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight">Bluesky Jetstream playground</h1>
-              <p className="text-muted-foreground">
-                Explore and experiment with the Bluesky Jetstream Firehose and HTTP APIs
-              </p>
-            </div>
+    <main className="flex-1">
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="space-y-6">
+          <div className="space-y-0">
+            <h1 className="text-3xl font-bold tracking-tight sr-only">Bluesky Jetstream playground</h1>
+            <p className="text-muted-foreground">
+              Explore and experiment with the Bluesky Jetstream Firehose and HTTP APIs
+            </p>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="md:col-span-1">
-                <ConnectionConfig
-                  isConnected={isConnected}
-                  options={connectionOptions}
-                  setOptions={setConnectionOptions}
-                  setIsConnected={setIsConnected}
-                />
-              </Card>
-              <Card className="md:col-span-1">
-                <ConnectionString options={connectionOptions} />
-                <LiveFilters filters={filters} onFiltersChange={setFilters} />
-              </Card>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <Card className="md:col-span-2">
+              <ConnectionConfig
+                isConnected={isConnected}
+                options={connectionOptions}
+                setOptions={setConnectionOptions}
+                setIsConnected={setIsConnected}
+              />
+            </Card>
+            <Card className="md:col-span-3">
+              <ConnectionString options={connectionOptions} />
+              <LiveFilters filters={filters} onFiltersChange={setFilters} />
+            </Card>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-              <Card className="md:col-span-2">
-                <MetricsDisplay metrics={metrics} />
-              </Card>
-              <Card className="md:col-span-3">
-                <StreamViewer messages={filteredMessages} />
-              </Card>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <Card className="md:col-span-2">
+              <MetricsDisplay metrics={metrics} />
+            </Card>
+            <Card className="md:col-span-3">
+              <StreamViewer messages={filteredMessages} />
+            </Card>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }

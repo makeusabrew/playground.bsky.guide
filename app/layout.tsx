@@ -27,7 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-16 items-center max-w-7xl px-4">
+          <div className="container flex h-16 items-center max-w-7xl px-6">
             <div className="flex flex-1 items-center justify-between">
               <div className="flex items-center space-x-3">
                 <Link
@@ -37,7 +37,7 @@ export default function RootLayout({
                   <span className="text-blue-500 font-semibold drop-shadow-[0_0_0.3rem_#0000ff70]">bsky.guide</span>
                 </Link>
                 <span className="text-muted-foreground/60">/</span>
-                <span className="font-medium text-muted-foreground">playground</span>
+                <span className="font-medium text-muted-foreground">Bluesky Jetstream Playground</span>
               </div>
             </div>
           </div>

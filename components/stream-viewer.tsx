@@ -89,7 +89,7 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
   return (
     <div className="h-[600px] flex flex-col">
       <div className="p-4 border-b flex-none flex items-center justify-between">
-        <h2 className="font-semibold">Raw output</h2>
+        <h2 className="font-semibold">Real-time message stream</h2>
       </div>
 
       <div
