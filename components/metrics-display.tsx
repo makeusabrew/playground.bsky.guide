@@ -32,7 +32,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
           </div>
           {metrics.totalMessages > 0 && (
             <Badge variant="outline" className="text-xs">
-              Last update: {new Date(metrics.lastUpdate).toLocaleTimeString()}
+              Updated: {new Date(metrics.lastUpdate).toLocaleTimeString()}
             </Badge>
           )}
         </div>

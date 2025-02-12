@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import type { JetstreamEvent } from '@/lib/playground/jetstream/types'
 
-const RATE_WINDOW = 5000 // 5 second window for rate calculation
-const UPDATE_INTERVAL = 500 // Update rates every second
-const DECAY_FACTOR = 0.8 // How quickly rates decay when no new messages arrive
+const RATE_WINDOW = 3000 // 3 second window for rate calculation
+const UPDATE_INTERVAL = 500
+const DECAY_FACTOR = 0.8 // Slightly faster decay
+const MINIMUM_RATE = 0.5 // Stop decaying when we hit this threshold
 
 export function useMetrics() {
   // Split the metrics into two states - one for totals and one for rates
@@ -69,12 +70,33 @@ export function useMetrics() {
 
         // If no recent messages, decay the rates
         if (recentMessagesRef.current.length === 0) {
+          // Check if any rates are still above our minimum threshold
+          const hasNonZeroRates =
+            prev.messagesPerSecond > MINIMUM_RATE ||
+            prev.createPerSecond > MINIMUM_RATE ||
+            prev.deletePerSecond > MINIMUM_RATE ||
+            Object.values(prev.collectionRates).some((rate) => rate > MINIMUM_RATE)
+
+          // If all rates are effectively zero, just return zeros
+          if (!hasNonZeroRates) {
+            return {
+              messagesPerSecond: 0,
+              createPerSecond: 0,
+              deletePerSecond: 0,
+              collectionRates: {},
+              lastUpdate: now,
+            }
+          }
+
+          // Otherwise continue decaying
           return {
-            messagesPerSecond: prev.messagesPerSecond * DECAY_FACTOR,
-            createPerSecond: prev.createPerSecond * DECAY_FACTOR,
-            deletePerSecond: prev.deletePerSecond * DECAY_FACTOR,
+            messagesPerSecond: Math.max(MINIMUM_RATE, prev.messagesPerSecond * DECAY_FACTOR),
+            createPerSecond: Math.max(MINIMUM_RATE, prev.createPerSecond * DECAY_FACTOR),
+            deletePerSecond: Math.max(MINIMUM_RATE, prev.deletePerSecond * DECAY_FACTOR),
             collectionRates: Object.fromEntries(
-              Object.entries(prev.collectionRates).map(([k, v]) => [k, v * DECAY_FACTOR])
+              Object.entries(prev.collectionRates)
+                .map(([k, v]) => [k, Math.max(MINIMUM_RATE, v * DECAY_FACTOR)])
+                .filter(([, v]) => typeof v === 'number' && v > MINIMUM_RATE) // Remove effectively zero rates
             ),
             lastUpdate: now,
           }
