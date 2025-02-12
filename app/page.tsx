@@ -119,15 +119,15 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             <div className="md:col-span-3 space-y-3">
-              <Card>
-                <MetricsDisplay metrics={metrics} />
-              </Card>
               <Card className={`${showShimmer ? 'animate-shimmer' : ''}`}>
                 <ConnectionConfig
                   connectionState={connectionState}
                   options={connectionOptions}
                   setOptions={setConnectionOptions}
                 />
+              </Card>
+              <Card>
+                <ConnectionString options={connectionOptions} />
               </Card>
             </div>
             <Card className="md:col-span-6">
@@ -138,7 +138,7 @@ export default function Home() {
                 <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
               </Card>
               <Card>
-                <ConnectionString options={connectionOptions} />
+                <MetricsDisplay metrics={metrics} />
               </Card>
             </div>
           </div>

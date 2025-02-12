@@ -3,7 +3,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { JetstreamConfig } from '@/types/jetstream'
-import { Badge } from '@/components/ui/badge'
 import { Settings } from 'lucide-react'
 import { ConnectionState } from '@/app/page'
 
@@ -13,9 +12,7 @@ interface ConnectionConfigProps {
   setOptions: (options: JetstreamConfig) => void
 }
 
-export default function ConnectionConfig({ connectionState, options, setOptions }: ConnectionConfigProps) {
-  const isConnected = connectionState.connected
-
+export default function ConnectionConfig({ options, setOptions }: ConnectionConfigProps) {
   return (
     <div className="p-3">
       <div className="space-y-6">
@@ -24,7 +21,6 @@ export default function ConnectionConfig({ connectionState, options, setOptions 
             <Settings size={16} className="text-muted-foreground" />
             <h2 className="font-semibold">Connection settings</h2>
           </div>
-          {/* <Badge variant={isConnected ? 'default' : 'secondary'}>{isConnected ? 'Connected' : 'Disconnected'}</Badge> */}
         </div>
 
         <div className="space-y-5">

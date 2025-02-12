@@ -171,7 +171,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   }
 
   return (
-    <div className="h-[500px] flex flex-col">
+    <div className="h-screen flex flex-col">
       <div className="p-3 border-b flex-none flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ScrollText size={16} className="text-muted-foreground" />
