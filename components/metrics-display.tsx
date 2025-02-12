@@ -2,7 +2,7 @@
 import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { Badge } from './ui/badge'
 import { ScrollArea } from './ui/scroll-area'
-
+import { Activity } from 'lucide-react'
 function formatNumber(num: number): string {
   if (num === 0) return '0'
   if (num >= 1000) return `${(num / 1000).toFixed(1)}k`
@@ -24,8 +24,11 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
   return (
     <div className="p-3">
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold">Real-time metrics</h2>
+        <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
+          <div className="flex items-center gap-2">
+            <Activity size={16} className="text-muted-foreground" />
+            <h2 className="font-semibold">Real-time metrics</h2>
+          </div>
           {metrics.totalMessages > 0 && (
             <Badge variant="outline" className="text-xs">
               Last update: {new Date(metrics.lastUpdate).toLocaleTimeString()}

@@ -112,8 +112,8 @@ export default function Home() {
               />
             </Card>
             <Card className="md:col-span-3">
+              <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!isConnected} />
               <ConnectionString options={connectionOptions} />
-              <LiveFilters filters={filters} onFiltersChange={setFilters} />
             </Card>
           </div>
         </div>

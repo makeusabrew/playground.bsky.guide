@@ -51,9 +51,10 @@ export interface FilterOptions {
 interface LiveFiltersProps {
   filters: FilterOptions
   onFiltersChange: (filters: FilterOptions) => void
+  disabled: boolean
 }
 
-export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersProps) {
+export default function LiveFilters({ filters, onFiltersChange, disabled }: LiveFiltersProps) {
   const updateFilter = <K extends keyof FilterOptions>(key: K, value: FilterOptions[K]) => {
     onFiltersChange({
       ...filters,
@@ -62,7 +63,7 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
   }
 
   return (
-    <div className="px-3">
+    <div className={`p-3 ${disabled ? 'opacity-50' : ''}`}>
       <div className="space-y-6">
         <div className="space-y-2">
           <h2 className="font-semibold flex items-center gap-2">
