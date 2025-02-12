@@ -1,5 +1,4 @@
 'use client'
-import { Card } from '@/components/ui/card'
 import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { Badge } from './ui/badge'
 import { ScrollArea } from './ui/scroll-area'
@@ -7,7 +6,7 @@ import { ScrollArea } from './ui/scroll-area'
 function formatNumber(num: number): string {
   if (num === 0) return '0'
   if (num >= 1000) return `${(num / 1000).toFixed(1)}k`
-  return num.toFixed(1)
+  return num.toFixed(0)
 }
 
 function formatRate(rate: number): string {
@@ -23,7 +22,7 @@ function getRateColor(rate: number): string {
 
 export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics }) {
   return (
-    <Card className="p-6">
+    <div className="p-6">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Real-time metrics</h2>
@@ -61,7 +60,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
         </div>
 
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground">Collections</h3>
+          <h2 className="font-semibold text-sm">Collections</h2>
           <ScrollArea className="h-[200px]">
             <div className="space-y-0">
               {Object.entries(metrics.messagesByCollection)
@@ -69,7 +68,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
                 .map(([collection, count]) => (
                   <div
                     key={collection}
-                    className="flex items-center justify-between py-2 px-4 rounded-md hover:bg-muted/50"
+                    className="flex items-center justify-between py-2 px-1.5 rounded-sm hover:bg-muted/50"
                   >
                     <div className="text-sm font-mono truncate flex-1">{collection}</div>
                     <div className="text-sm tabular-nums flex items-center gap-3">
@@ -84,6 +83,6 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
           </ScrollArea>
         </div>
       </div>
-    </Card>
+    </div>
   )
 }

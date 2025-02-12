@@ -1,5 +1,4 @@
 'use client'
-import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -16,7 +15,7 @@ interface ConnectionConfigProps {
 
 export default function ConnectionConfig({ isConnected, options, setOptions, setIsConnected }: ConnectionConfigProps) {
   return (
-    <Card className="p-6">
+    <div className="p-6">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">Connection settings</h2>
@@ -126,6 +125,6 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
           </Button>
         </div>
       </div>
-    </Card>
+    </div>
   )
 }

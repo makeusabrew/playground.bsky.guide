@@ -1,5 +1,4 @@
 import { Button } from './ui/button'
-import { Card } from './ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { JetstreamConfig } from '@/types/jetstream'
 
@@ -7,7 +6,7 @@ export function ConnectionString({ options }: { options: JetstreamConfig }) {
   const connectionStrings = buildConnectionString(options)
 
   return (
-    <Card className="p-6">
+    <div className="p-6">
       <div className="space-y-4">
         <h2 className="font-semibold">Connection string</h2>
 
@@ -39,7 +38,7 @@ export function ConnectionString({ options }: { options: JetstreamConfig }) {
           ))}
         </Tabs>
       </div>
-    </Card>
+    </div>
   )
 }
 
