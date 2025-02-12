@@ -1,6 +1,6 @@
 'use client'
 import { createContext, useContext, ReactNode } from 'react'
-import { useJetstream } from '../hooks/use-jetstream'
+import { useJetstream } from '@/app/hooks/use-jetstream'
 
 const JetstreamContext = createContext<ReturnType<typeof useJetstream> | null>(null)
 

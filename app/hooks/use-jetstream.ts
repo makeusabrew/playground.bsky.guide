@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
-import { createJetstreamConsumer } from '../../lib/playground/jetstream/consumer'
+import { createJetstreamConsumer } from '@/lib/playground/jetstream/consumer'
+import type { JetstreamEvent } from '@/lib/playground/jetstream/types'
 
 type UseJetstreamOptions = {
   instance: string

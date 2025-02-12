@@ -7,7 +7,7 @@ import { Switch } from '@/components/ui/switch'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useState } from 'react'
-import { useJetstream } from '@/app/hooks/use-jetstream'
+import { useJetstreamContext } from '@/app/context/JetstreamContext'
 
 export default function ConnectionConfig() {
   const [instance, setInstance] = useState('jetstream2.us-east.bsky.network')
@@ -16,14 +16,7 @@ export default function ConnectionConfig() {
   const [cursor, setCursor] = useState('')
   const [compression, setCompression] = useState(false)
 
-  const { status, error, connect, disconnect } = useJetstream({
-    instance,
-    collections,
-    dids,
-    cursor,
-    compression,
-  })
-
+  const { status, error, connect, disconnect } = useJetstreamContext()
   const isConnected = status === 'connected'
 
   const buildConnectionString = () => {

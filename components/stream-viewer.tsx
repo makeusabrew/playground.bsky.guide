@@ -1,11 +1,9 @@
 'use client'
 import { Card } from '@/components/ui/card'
-import { useJetstream } from '@/app/hooks/use-jetstream'
+import { useJetstreamContext } from '@/app/context/JetstreamContext'
 
 export default function StreamViewer() {
-  const { messages } = useJetstream({
-    instance: '', // We'll get these from a shared context in a moment
-  })
+  const { messages } = useJetstreamContext()
 
   return (
     <Card className="p-4 h-[600px] overflow-auto">
