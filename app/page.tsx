@@ -85,9 +85,7 @@ export default function Home() {
         <div className="space-y-6">
           <div className="space-y-0">
             <h1 className="text-3xl font-bold tracking-tight sr-only">Bluesky Jetstream playground</h1>
-            <p className="text-muted-foreground">
-              Explore and experiment with the Bluesky Jetstream Firehose and HTTP APIs
-            </p>
+            <p>Explore and experiment with the Bluesky Jetstream Firehose and HTTP APIs</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-6">

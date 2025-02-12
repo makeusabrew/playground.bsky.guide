@@ -1,13 +1,9 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist } from 'next/font/google'
 import Link from 'next/link'
 import './globals.css'
 
 const geistSans = Geist({
-  subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
@@ -22,21 +18,29 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-16 items-center max-w-7xl px-6">
+        <header className="sticky top-0 z-50 w-full border-b  bg-white">
+          <div className="container flex h-14 max-w-7xl items-center px-6">
             <div className="flex flex-1 items-center justify-between">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
                 <Link
-                  href="https://bsky.guide"
+                  href="/"
                   className="flex items-center space-x-2 text-sm font-medium transition-colors hover:text-blue-500/90"
                 >
                   <span className="text-blue-500 font-semibold drop-shadow-[0_0_0.3rem_#0000ff70]">bsky.guide</span>
                 </Link>
                 <span className="text-muted-foreground/60">/</span>
-                <span className="font-medium text-muted-foreground">Bluesky Jetstream Playground</span>
+                <span className="font-medium">Bluesky Jetstream Playground</span>
               </div>
+              <a
+                href="https://bsky.app/profile/makeusabrew.bsky.social"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                @makeusabrew
+              </a>
             </div>
           </div>
         </header>
