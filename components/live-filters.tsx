@@ -70,13 +70,13 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
             <Filter size={16} className="text-muted-foreground" />
             Live filters
           </h2>
-          <p className="text-sm text-muted-foreground">Filter the stream in real-time</p>
+          {/* <p className="text-sm text-muted-foreground">Filter the stream in real-time</p> */}
         </div>
 
         <div className="space-y-4">
           <div className="space-y-3">
             <h3 className="text-sm font-medium">Event types</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className=" flex flex-col gap-2">
               <div className="flex items-center space-x-2">
                 <Switch
                   id="creates"
@@ -137,7 +137,7 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
 
           <div className="space-y-3">
             <h3 className="text-sm font-medium">Collections</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="flex flex-col gap-2">
               {Object.entries(COMMON_COLLECTIONS).map(([collection, name]) => (
                 <div key={collection} className="flex items-center space-x-2">
                   <Switch

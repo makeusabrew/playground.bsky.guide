@@ -117,27 +117,30 @@ export default function Home() {
             <div className="text-sm">Explore the Jetstream firehose and Bluesky HTTP APIs</div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Card className="md:col-span-2">
-              <MetricsDisplay metrics={metrics} />
-            </Card>
-            <Card className="md:col-span-3">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="md:col-span-3 space-y-3">
+              <Card>
+                <MetricsDisplay metrics={metrics} />
+              </Card>
+              <Card className={`${showShimmer ? 'animate-shimmer' : ''}`}>
+                <ConnectionConfig
+                  connectionState={connectionState}
+                  options={connectionOptions}
+                  setOptions={setConnectionOptions}
+                />
+              </Card>
+            </div>
+            <Card className="md:col-span-6">
               <StreamViewer messages={jetstream.messages} filteredMessages={filteredMessages} />
             </Card>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <Card className={`md:col-span-2 ${showShimmer ? 'animate-shimmer' : ''}`}>
-              <ConnectionConfig
-                connectionState={connectionState}
-                options={connectionOptions}
-                setOptions={setConnectionOptions}
-              />
-            </Card>
-            <Card className="md:col-span-3">
-              <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
-              <ConnectionString options={connectionOptions} />
-            </Card>
+            <div className="md:col-span-3 space-y-3">
+              <Card>
+                <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
+              </Card>
+              <Card>
+                <ConnectionString options={connectionOptions} />
+              </Card>
+            </div>
           </div>
         </div>
       </div>

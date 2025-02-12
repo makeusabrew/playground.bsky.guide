@@ -24,7 +24,7 @@ export default function ConnectionConfig({ connectionState, options, setOptions 
             <Settings size={16} className="text-muted-foreground" />
             <h2 className="font-semibold">Connection settings</h2>
           </div>
-          <Badge variant={isConnected ? 'default' : 'secondary'}>{isConnected ? 'Connected' : 'Disconnected'}</Badge>
+          {/* <Badge variant={isConnected ? 'default' : 'secondary'}>{isConnected ? 'Connected' : 'Disconnected'}</Badge> */}
         </div>
 
         <div className="space-y-5">
