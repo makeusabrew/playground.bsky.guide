@@ -8,6 +8,7 @@ import { useJetstream } from './hooks/use-jetstream'
 import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
+import LiveFilters, { FilterOptions, COMMON_COLLECTIONS } from '@/components/live-filters'
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState(false)
@@ -17,7 +18,17 @@ export default function Home() {
     collections: '',
     dids: '',
     cursor: undefined,
-    messageLimit: '1000',
+    messageLimit: '10000',
+  })
+
+  const [filters, setFilters] = useState<FilterOptions>({
+    showCreates: true,
+    showUpdates: true,
+    showDeletes: true,
+    showIdentity: true,
+    showAccount: true,
+    selectedCollections: Object.keys(COMMON_COLLECTIONS),
+    didFilter: '',
   })
 
   const jetstream = useJetstream(connectionOptions)
@@ -29,6 +40,31 @@ export default function Home() {
       jetstream.disconnect()
     }
   }, [isConnected])
+
+  // Apply filters to messages
+  const filteredMessages = jetstream.messages.filter((msg) => {
+    // Filter by event kind
+    if (msg.kind === 'identity' && !filters.showIdentity) return false
+    if (msg.kind === 'account' && !filters.showAccount) return false
+    if (msg.kind === 'commit') {
+      // Filter by operation type
+      if (msg.commit.operation === 'create' && !filters.showCreates) return false
+      if (msg.commit.operation === 'update' && !filters.showUpdates) return false
+      if (msg.commit.operation === 'delete' && !filters.showDeletes) return false
+
+      // Filter by collection
+      if (!filters.selectedCollections.includes(msg.commit.collection)) {
+        return false
+      }
+    }
+
+    // Filter by DID
+    if (filters.didFilter && !msg.did.toLowerCase().includes(filters.didFilter.toLowerCase())) {
+      return false
+    }
+
+    return true
+  })
 
   // FIXME: need to build a new object otherwise the metrics display doesn't re-render
   const metrics: JetstreamMetrics = {
@@ -43,7 +79,6 @@ export default function Home() {
     lastUpdate: jetstream.metrics.lastUpdate,
   }
 
-  const rawMessages = jetstream.messages.map((m) => JSON.stringify(m))
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
@@ -56,8 +91,8 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-              <Card className="md:col-span-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="md:col-span-1">
                 <ConnectionConfig
                   isConnected={isConnected}
                   options={connectionOptions}
@@ -65,14 +100,19 @@ export default function Home() {
                   setIsConnected={setIsConnected}
                 />
               </Card>
-              <Card className="md:col-span-3">
+              <Card className="md:col-span-2">
                 <ConnectionString options={connectionOptions} />
                 <MetricsDisplay metrics={metrics} />
               </Card>
             </div>
 
-            <div className="space-y-6">
-              <StreamViewer messages={rawMessages} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-1">
+                <LiveFilters filters={filters} onFiltersChange={setFilters} />
+              </div>
+              <div className="md:col-span-2">
+                <StreamViewer messages={filteredMessages} />
+              </div>
             </div>
           </div>
         </div>
