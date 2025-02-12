@@ -6,6 +6,7 @@ import MetricsDisplay from '@/components/metrics-display'
 import { JetstreamConfig } from '@/types/jetstream'
 import { useJetstream } from './hooks/use-jetstream'
 import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
+import { ConnectionString } from '@/components/connection-string'
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState(false)
@@ -52,15 +53,22 @@ export default function Home() {
               </p>
             </div>
 
-            <ConnectionConfig
-              isConnected={isConnected}
-              options={connectionOptions}
-              setOptions={setConnectionOptions}
-              setIsConnected={setIsConnected}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+              <div className="md:col-span-2">
+                <ConnectionConfig
+                  isConnected={isConnected}
+                  options={connectionOptions}
+                  setOptions={setConnectionOptions}
+                  setIsConnected={setIsConnected}
+                />
+              </div>
+              <div className="md:col-span-3 space-y-6">
+                <ConnectionString options={connectionOptions} />
+                <MetricsDisplay metrics={metrics} />
+              </div>
+            </div>
 
             <div className="space-y-6">
-              <MetricsDisplay metrics={metrics} />
               <StreamViewer messages={jetstream.messages} />
             </div>
           </div>
