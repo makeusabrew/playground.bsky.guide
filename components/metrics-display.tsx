@@ -34,15 +34,15 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <div className="space-y-2 p-4 rounded-lg bg-muted/50">
-            <div className="text-sm font-medium text-muted-foreground">Total messages</div>
+          <div className="space-y-2 p-3 rounded-lg bg-muted/50">
+            <div className="text-sm font-medium text-muted-foreground">Messages</div>
             <div className="text-3xl font-bold tracking-tight">{formatNumber(metrics.totalMessages)}</div>
             <div className={`text-sm ${getRateColor(metrics.messagesPerSecond)}`}>
               {formatRate(metrics.messagesPerSecond)}
             </div>
           </div>
 
-          <div className="space-y-2 p-4 rounded-lg bg-muted/50">
+          <div className="space-y-2 p-3 rounded-lg bg-muted/50">
             <div className="text-sm font-medium text-muted-foreground">Creates</div>
             <div className="text-3xl font-bold tracking-tight">{formatNumber(metrics.totalCreates)}</div>
             <div className={`text-sm ${getRateColor(metrics.createPerSecond)}`}>
@@ -50,7 +50,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
             </div>
           </div>
 
-          <div className="space-y-2 p-4 rounded-lg bg-muted/50">
+          <div className="space-y-2 p-3 rounded-lg bg-muted/50">
             <div className="text-sm font-medium text-muted-foreground">Deletes</div>
             <div className="text-3xl font-bold tracking-tight">{formatNumber(metrics.totalDeletes)}</div>
             <div className={`text-sm ${getRateColor(metrics.deletePerSecond)}`}>

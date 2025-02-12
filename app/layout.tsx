@@ -4,12 +4,10 @@ import Link from 'next/link'
 import './globals.css'
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
   subsets: ['latin'],
 })
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
   subsets: ['latin'],
 })
 
@@ -25,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.className} antialiased`}>
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container flex h-16 items-center max-w-7xl px-6">
             <div className="flex flex-1 items-center justify-between">
