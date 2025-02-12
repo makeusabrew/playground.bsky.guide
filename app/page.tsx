@@ -11,8 +11,8 @@ export default function Home() {
     collections: '',
     dids: '',
     cursor: '',
-    compression: false,
-    messageLimit: '10000',
+    // compression: false,
+    messageLimit: '1000',
   })
 
   return (
