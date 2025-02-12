@@ -2,6 +2,7 @@
 import { Card } from '@/components/ui/card'
 import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { Badge } from './ui/badge'
+import { ScrollArea } from './ui/scroll-area'
 
 function formatNumber(num: number): string {
   if (num === 0) return '0'
@@ -61,24 +62,26 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
 
         <div className="space-y-3">
           <h3 className="text-sm font-medium text-muted-foreground">Collections</h3>
-          <div className="space-y-1">
-            {Object.entries(metrics.messagesByCollection)
-              .sort(([, a], [, b]) => b - a)
-              .map(([collection, count]) => (
-                <div
-                  key={collection}
-                  className="flex items-center justify-between py-2 px-4 rounded-md hover:bg-muted/50"
-                >
-                  <div className="text-sm font-mono truncate flex-1">{collection}</div>
-                  <div className="text-sm tabular-nums flex items-center gap-3">
-                    <span className="font-medium">{formatNumber(count)}</span>
-                    <span className={`${getRateColor(metrics.collectionRates[collection] || 0)}`}>
-                      {formatRate(metrics.collectionRates[collection] || 0)}
-                    </span>
+          <ScrollArea className="h-[200px]">
+            <div className="space-y-0">
+              {Object.entries(metrics.messagesByCollection)
+                .sort(([, a], [, b]) => b - a)
+                .map(([collection, count]) => (
+                  <div
+                    key={collection}
+                    className="flex items-center justify-between py-2 px-4 rounded-md hover:bg-muted/50"
+                  >
+                    <div className="text-sm font-mono truncate flex-1">{collection}</div>
+                    <div className="text-sm tabular-nums flex items-center gap-3">
+                      <span className="font-medium">{formatNumber(count)}</span>
+                      <span className={`${getRateColor(metrics.collectionRates[collection] || 0)}`}>
+                        {formatRate(metrics.collectionRates[collection] || 0)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
-          </div>
+                ))}
+            </div>
+          </ScrollArea>
         </div>
       </div>
     </Card>
