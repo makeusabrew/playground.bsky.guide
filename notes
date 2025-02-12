@@ -1,0 +1,6 @@
+* BUG: resume no longer works - skips to the end, or sometimes at least?
+* FIX: filters need sorting
+* FIX: filters should apply to stats
+* FEAT: allow a 'raw' post to be 'resolved' - fetch dids, URIs, etc, rendered in a dialog?
+* FEAT: automatic hydration sometimes?
+* FEAT: show HTTP requests when they are added

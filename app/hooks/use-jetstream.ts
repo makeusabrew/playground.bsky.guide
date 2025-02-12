@@ -14,8 +14,8 @@ export const useJetstream = (options: UseJetstreamOptions) => {
   const [error, setError] = useState<Error | undefined>()
   const [messages, setMessages] = useState<JetstreamEvent[]>([])
 
-  // Parse message limit with fallback
-  const limit = Math.max(1, Math.min(100000, parseInt(options.messageLimit || '1000', 10)))
+  // TODO: might come from input, but not at the moment
+  const limit = 100000
 
   const collections = options.collections
     ?.split(',')

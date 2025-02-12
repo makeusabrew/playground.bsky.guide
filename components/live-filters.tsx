@@ -19,6 +19,13 @@ import {
   Filter,
 } from 'lucide-react'
 
+/**
+ * TODO: segment the filters properly here - we've got "identity" and "account" as "event types"
+ * but these are `kind` properties (commit, identity, account)
+ *
+ * Similarly the other "types" are "operation"
+ */
+
 // Common Bluesky collections with friendly names
 export const COMMON_COLLECTIONS = {
   'app.bsky.feed.post': 'Post',

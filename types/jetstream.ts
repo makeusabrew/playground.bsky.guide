@@ -3,5 +3,4 @@ export interface JetstreamConfig {
   collections: string
   dids: string
   cursor: string | undefined
-  messageLimit: string
 }

@@ -11,7 +11,6 @@ const DEFAULT_CONNECTION_OPTIONS: JetstreamConfig = {
   collections: '',
   dids: '',
   cursor: undefined,
-  messageLimit: '1000',
 }
 
 export function useConnection() {
