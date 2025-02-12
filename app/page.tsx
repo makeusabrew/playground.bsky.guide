@@ -42,6 +42,8 @@ export default function Home() {
     collectionRates: jetstream.metrics.collectionRates,
     lastUpdate: jetstream.metrics.lastUpdate,
   }
+
+  const rawMessages = jetstream.messages.map((m) => JSON.stringify(m))
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
@@ -70,7 +72,7 @@ export default function Home() {
             </div>
 
             <div className="space-y-6">
-              <StreamViewer messages={jetstream.messages} />
+              <StreamViewer messages={rawMessages} />
             </div>
           </div>
         </div>

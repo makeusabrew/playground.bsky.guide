@@ -9,7 +9,7 @@ type ConsumerOptions = {
   cursor?: number
   compression?: boolean
   metricsManager: MetricsManager
-  onEvent?: (event: JetstreamEvent) => void
+  onMessage: (event: JetstreamEvent) => void
   onError?: (error: Error) => void
   onStateChange?: (state: ConsumerState) => void
 }
@@ -62,7 +62,7 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
         const event = JSON.parse(data) as JetstreamEvent
         updateState({ cursor: event.time_us })
         options.metricsManager.updateMetrics(event)
-        options.onEvent?.(event)
+        options.onMessage(event)
       } catch (err: unknown) {
         console.error(`Failed to parse Jetstream event`, err)
         options.onError?.(new Error('Failed to parse Jetstream event'))

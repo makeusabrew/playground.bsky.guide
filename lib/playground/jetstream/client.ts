@@ -25,12 +25,9 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
 
   const getState = () => ({ ...state })
 
-  console.log(`WS working URL`, options.url)
-
   const connect = () => {
     if (ws?.readyState === WebSocket.OPEN) return
 
-    console.log(`connecting to ${options.url}`)
     ws = new WebSocket(options.url)
 
     ws.onopen = () => {

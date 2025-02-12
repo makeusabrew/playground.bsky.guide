@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { createJetstreamConsumer } from '@/lib/playground/jetstream/consumer'
 import { createMetricsManager } from '@/lib/playground/jetstream/metrics-manager'
-import type { JetstreamMetrics } from '@/lib/playground/jetstream/types'
+import type { JetstreamEvent, JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { JetstreamConfig } from '@/types/jetstream'
 
 type JetstreamStatus = 'disconnected' | 'connecting' | 'connected' | 'paused'
@@ -9,7 +9,7 @@ type JetstreamStatus = 'disconnected' | 'connecting' | 'connected' | 'paused'
 export const useJetstream = (options: JetstreamConfig) => {
   const [status, setStatus] = useState<JetstreamStatus>('disconnected')
   const [error, setError] = useState<Error | undefined>()
-  const [messages, setMessages] = useState<string[]>([])
+  const [messages, setMessages] = useState<JetstreamEvent[]>([])
   const [metrics, setMetrics] = useState<JetstreamMetrics>({
     totalMessages: 0,
     messagesByCollection: {},
@@ -44,9 +44,9 @@ export const useJetstream = (options: JetstreamConfig) => {
     cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
     compression: false,
     metricsManager,
-    onEvent: (event) => {
+    onMessage: (event) => {
       setMessages((prev) => {
-        const newMessages = [...prev, JSON.stringify(event, null, 2)]
+        const newMessages = [...prev, event]
         return newMessages.slice(-limit)
       })
     },
