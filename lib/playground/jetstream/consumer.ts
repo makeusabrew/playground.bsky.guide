@@ -1,5 +1,5 @@
 import type { JetstreamEvent } from './types'
-import { createWebSocketClient } from './websocket-client'
+import { createWebSocketClient } from './client'
 
 type ConsumerOptions = {
   instance: string

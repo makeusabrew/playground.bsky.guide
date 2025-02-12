@@ -1,9 +1,20 @@
+'use client'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
 import MetricsDisplay from '@/components/metrics-display'
+import { JetstreamProvider } from '@/app/context/JetstreamContext'
+import { useState } from 'react'
 
 export default function Home() {
+  const [config, setConfig] = useState({
+    instance: 'jetstream2.us-east.bsky.network',
+    collections: '',
+    dids: '',
+    cursor: '',
+    compression: false,
+  })
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
@@ -16,23 +27,25 @@ export default function Home() {
               </p>
             </div>
 
-            <Tabs defaultValue="stream" className="space-y-4">
-              <TabsList>
-                <TabsTrigger value="stream">Stream viewer</TabsTrigger>
-                <TabsTrigger value="metrics">Metrics</TabsTrigger>
-              </TabsList>
+            <JetstreamProvider {...config}>
+              <Tabs defaultValue="stream" className="space-y-4">
+                <TabsList>
+                  <TabsTrigger value="stream">Stream viewer</TabsTrigger>
+                  <TabsTrigger value="metrics">Metrics</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="stream" className="space-y-4">
-                <div className="grid gap-4 md:grid-cols-[400px_1fr]">
-                  <ConnectionConfig />
-                  <StreamViewer />
-                </div>
-              </TabsContent>
+                <TabsContent value="stream" className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-[400px_1fr]">
+                    <ConnectionConfig />
+                    <StreamViewer />
+                  </div>
+                </TabsContent>
 
-              <TabsContent value="metrics">
-                <MetricsDisplay />
-              </TabsContent>
-            </Tabs>
+                <TabsContent value="metrics">
+                  <MetricsDisplay />
+                </TabsContent>
+              </Tabs>
+            </JetstreamProvider>
           </div>
         </div>
       </main>
