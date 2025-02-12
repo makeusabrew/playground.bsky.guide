@@ -1,6 +1,7 @@
 import { Button } from './ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { JetstreamConfig } from '@/types/jetstream'
+import { Copy, Terminal, Globe, Code } from 'lucide-react'
 
 export function ConnectionString({ options }: { options: JetstreamConfig }) {
   const connectionStrings = buildConnectionString(options)
@@ -12,9 +13,18 @@ export function ConnectionString({ options }: { options: JetstreamConfig }) {
 
         <Tabs defaultValue="raw" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="raw">Raw URL</TabsTrigger>
-            <TabsTrigger value="websocat">Websocat</TabsTrigger>
-            <TabsTrigger value="javascript">JavaScript</TabsTrigger>
+            <TabsTrigger value="raw" className="flex items-center gap-2">
+              <Globe size={14} />
+              Raw URL
+            </TabsTrigger>
+            <TabsTrigger value="websocat" className="flex items-center gap-2">
+              <Terminal size={14} />
+              Websocat
+            </TabsTrigger>
+            <TabsTrigger value="javascript" className="flex items-center gap-2">
+              <Code size={14} />
+              JavaScript
+            </TabsTrigger>
           </TabsList>
 
           {['raw', 'websocat', 'javascript'].map((tab) => (
@@ -24,14 +34,14 @@ export function ConnectionString({ options }: { options: JetstreamConfig }) {
                   <code>{connectionStrings[tab as keyof typeof connectionStrings]}</code>
                 </pre>
                 <Button
-                  size="sm"
-                  variant="secondary"
-                  className="absolute top-2 right-2"
+                  size="icon"
+                  variant="ghost"
+                  className="absolute top-2 right-2 h-8 w-8 hover:bg-background"
                   onClick={() =>
                     navigator.clipboard.writeText(connectionStrings[tab as keyof typeof connectionStrings])
                   }
                 >
-                  Copy
+                  <Copy size={14} />
                 </Button>
               </div>
             </TabsContent>

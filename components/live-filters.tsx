@@ -1,9 +1,23 @@
 'use client'
 
-import { Card } from './ui/card'
 import { Switch } from './ui/switch'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
+import {
+  Plus,
+  Pencil,
+  Trash,
+  UserRound,
+  ShieldCheck,
+  MessageSquare,
+  Heart,
+  Repeat,
+  Users,
+  Ban,
+  User,
+  X,
+  Filter,
+} from 'lucide-react'
 
 // Common Bluesky collections with friendly names
 export const COMMON_COLLECTIONS = {
@@ -14,6 +28,15 @@ export const COMMON_COLLECTIONS = {
   'app.bsky.graph.block': 'Block',
   'app.bsky.actor.profile': 'Profile',
 } as const
+
+const COLLECTION_ICONS: Record<string, React.ReactNode> = {
+  'app.bsky.feed.post': <MessageSquare size={14} />,
+  'app.bsky.feed.like': <Heart size={14} />,
+  'app.bsky.feed.repost': <Repeat size={14} />,
+  'app.bsky.graph.follow': <Users size={14} />,
+  'app.bsky.graph.block': <Ban size={14} />,
+  'app.bsky.actor.profile': <User size={14} />,
+}
 
 export interface FilterOptions {
   showCreates: boolean
@@ -42,7 +65,10 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
     <div className="px-6">
       <div className="space-y-6">
         <div className="space-y-2">
-          <h2 className="font-semibold">Live filters</h2>
+          <h2 className="font-semibold flex items-center gap-2">
+            <Filter size={16} className="text-muted-foreground" />
+            Live filters
+          </h2>
           <p className="text-sm text-muted-foreground">Filter the stream in real-time</p>
         </div>
 
@@ -56,7 +82,8 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
                   checked={filters.showCreates}
                   onCheckedChange={(checked) => updateFilter('showCreates', checked)}
                 />
-                <label htmlFor="creates" className="text-sm">
+                <label htmlFor="creates" className="text-sm flex items-center gap-1.5">
+                  <Plus size={14} />
                   Creates
                 </label>
               </div>
@@ -66,7 +93,8 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
                   checked={filters.showUpdates}
                   onCheckedChange={(checked) => updateFilter('showUpdates', checked)}
                 />
-                <label htmlFor="updates" className="text-sm">
+                <label htmlFor="updates" className="text-sm flex items-center gap-1.5">
+                  <Pencil size={14} />
                   Updates
                 </label>
               </div>
@@ -76,7 +104,8 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
                   checked={filters.showDeletes}
                   onCheckedChange={(checked) => updateFilter('showDeletes', checked)}
                 />
-                <label htmlFor="deletes" className="text-sm">
+                <label htmlFor="deletes" className="text-sm flex items-center gap-1.5">
+                  <Trash size={14} />
                   Deletes
                 </label>
               </div>
@@ -86,7 +115,8 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
                   checked={filters.showIdentity}
                   onCheckedChange={(checked) => updateFilter('showIdentity', checked)}
                 />
-                <label htmlFor="identity" className="text-sm">
+                <label htmlFor="identity" className="text-sm flex items-center gap-1.5">
+                  <UserRound size={14} />
                   Identity
                 </label>
               </div>
@@ -96,7 +126,8 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
                   checked={filters.showAccount}
                   onCheckedChange={(checked) => updateFilter('showAccount', checked)}
                 />
-                <label htmlFor="account" className="text-sm">
+                <label htmlFor="account" className="text-sm flex items-center gap-1.5">
+                  <ShieldCheck size={14} />
                   Account
                 </label>
               </div>
@@ -120,7 +151,8 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
                       )
                     }}
                   />
-                  <label htmlFor={collection} className="text-sm">
+                  <label htmlFor={collection} className="text-sm flex items-center gap-1.5">
+                    {COLLECTION_ICONS[collection]}
                     {name}
                   </label>
                 </div>
@@ -138,7 +170,7 @@ export default function LiveFilters({ filters, onFiltersChange }: LiveFiltersPro
               />
               {filters.didFilter && (
                 <Button variant="outline" size="icon" onClick={() => updateFilter('didFilter', '')}>
-                  ×
+                  <X size={16} />
                 </Button>
               )}
             </div>

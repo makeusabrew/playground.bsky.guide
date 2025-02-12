@@ -1,14 +1,59 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { Card } from '@/components/ui/card'
 import { JetstreamEvent } from '@/lib/playground/jetstream/types'
 import { Badge } from './ui/badge'
+import {
+  Plus,
+  Pencil,
+  Trash,
+  UserRound,
+  ShieldCheck,
+  MessageSquare,
+  Heart,
+  Repeat,
+  Users,
+  Ban,
+  User,
+  PlayCircle,
+} from 'lucide-react'
 
 interface StreamViewerProps {
   messages: JetstreamEvent[]
 }
 
 type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
+
+const getOperationIcon = (operation: string) => {
+  switch (operation) {
+    case 'create':
+      return <Plus size={14} />
+    case 'update':
+      return <Pencil size={14} />
+    case 'delete':
+      return <Trash size={14} />
+    default:
+      return null
+  }
+}
+
+const getCollectionIcon = (collection: string) => {
+  switch (collection) {
+    case 'app.bsky.feed.post':
+      return <MessageSquare size={14} />
+    case 'app.bsky.feed.like':
+      return <Heart size={14} />
+    case 'app.bsky.feed.repost':
+      return <Repeat size={14} />
+    case 'app.bsky.graph.follow':
+      return <Users size={14} />
+    case 'app.bsky.graph.block':
+      return <Ban size={14} />
+    case 'app.bsky.actor.profile':
+      return <User size={14} />
+    default:
+      return null
+  }
+}
 
 export default function StreamViewer({ messages }: StreamViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -88,7 +133,8 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
 
   return (
     <div className="h-[600px] flex flex-col">
-      <div className="p-4 border-b flex-none flex items-center justify-between">
+      <div className="p-4 border-b flex-none flex items-center gap-2">
+        <PlayCircle size={16} className="text-muted-foreground" />
         <h2 className="font-semibold">Real-time message stream</h2>
       </div>
 
@@ -110,11 +156,27 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
             {displayMessages.map((msg, i) => (
               <div key={i} className={`text-xs rounded-md p-2 ${getEventColor(msg)}`}>
                 <div className="flex items-center gap-2 mb-1">
-                  <Badge variant={getEventBadgeColor(msg)}>
-                    {msg.kind === 'commit' ? msg.commit.operation : msg.kind}
+                  <Badge variant={getEventBadgeColor(msg)} className="flex items-center gap-1.5">
+                    {msg.kind === 'commit' ? (
+                      <>
+                        {getOperationIcon(msg.commit.operation)}
+                        {msg.commit.operation}
+                      </>
+                    ) : msg.kind === 'identity' ? (
+                      <>
+                        <UserRound size={14} />
+                        {msg.kind}
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheck size={14} />
+                        {msg.kind}
+                      </>
+                    )}
                   </Badge>
                   {msg.kind === 'commit' && (
-                    <Badge variant="outline" className="font-mono">
+                    <Badge variant="outline" className="flex items-center gap-1.5 font-mono">
+                      {getCollectionIcon(msg.commit.collection)}
                       {msg.commit.collection.split('.').pop()}
                     </Badge>
                   )}
