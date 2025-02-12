@@ -16,7 +16,7 @@ import {
   User,
   ScrollText,
 } from 'lucide-react'
-
+import { Card } from './ui/card'
 interface StreamViewerProps {
   messages: JetstreamEvent[]
   filteredMessages: JetstreamEvent[]
@@ -171,7 +171,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <Card className="h-[calc(100vh-200px)] flex flex-col">
       <div className="p-3 border-b flex-none flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ScrollText size={16} className="text-muted-foreground" />
@@ -236,6 +236,6 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
           </div>
         )}
       </div>
-    </div>
+    </Card>
   )
 }

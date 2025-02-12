@@ -17,11 +17,10 @@ export default function ConnectionControls({
   const isConnected = connectionState.connected
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center justify-between gap-2 p-3">
       {isConnected ? (
         <Button
-          size="lg"
-          className="min-w-[120px] flex items-center gap-2"
+          className="w-full flex items-center gap-2"
           onClick={() => setConnectionState({ connected: false, mode: 'restart' })}
         >
           <PauseCircle className="w-4 h-4" />
@@ -32,16 +31,14 @@ export default function ConnectionControls({
           {hasEverConnected ? (
             <>
               <Button
-                size="lg"
-                className="min-w-[120px] flex items-center gap-2"
+                className="w-full flex items-center gap-2"
                 onClick={() => setConnectionState({ connected: true, mode: 'resume' })}
               >
                 <PlayCircle className="w-4 h-4" />
                 Resume
               </Button>
               <Button
-                size="lg"
-                className="min-w-[120px] flex items-center gap-2"
+                className=" flex items-center gap-2"
                 onClick={() => setConnectionState({ connected: true, mode: 'restart' })}
                 variant="secondary"
               >
@@ -51,8 +48,7 @@ export default function ConnectionControls({
             </>
           ) : (
             <Button
-              size="lg"
-              className="min-w-[120px] flex items-center gap-2"
+              className="w-full flex items-center gap-2"
               onClick={() => setConnectionState({ connected: true, mode: 'restart' })}
               variant="default"
             >

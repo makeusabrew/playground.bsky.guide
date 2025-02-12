@@ -23,7 +23,7 @@ function getRateColor(rate: number): string {
 export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics }) {
   return (
     <div className="p-3">
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
           <div className="flex items-center gap-2">
             <Activity size={16} className="text-muted-foreground" />
@@ -36,45 +36,53 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
           )}
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <div className="space-y-2 p-3 rounded-lg bg-muted/50">
-            <div className="text-sm font-medium text-muted-foreground">Messages</div>
-            <div className="text-3xl font-bold tracking-tight">{formatNumber(metrics.totalMessages)}</div>
-            <div className={`text-sm ${getRateColor(metrics.messagesPerSecond)}`}>
-              {formatRate(metrics.messagesPerSecond)}
+        {/* Main stats - now in a vertical layout */}
+        <div className="space-y-2">
+          <div className="p-2 rounded-lg bg-muted/50">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium text-muted-foreground">Messages</div>
+              <div className={`text-sm font-medium ${getRateColor(metrics.messagesPerSecond)}`}>
+                {formatRate(metrics.messagesPerSecond)}
+              </div>
             </div>
+            <div className="text-2xl font-bold tracking-tight mt-1">{formatNumber(metrics.totalMessages)}</div>
           </div>
 
-          <div className="space-y-2 p-3 rounded-lg bg-muted/50">
-            <div className="text-sm font-medium text-muted-foreground">Creates</div>
-            <div className="text-3xl font-bold tracking-tight">{formatNumber(metrics.totalCreates)}</div>
-            <div className={`text-sm ${getRateColor(metrics.createPerSecond)}`}>
-              {formatRate(metrics.createPerSecond)}
+          <div className="p-2 rounded-lg bg-muted/50">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium text-muted-foreground">Creates</div>
+              <div className={`text-sm font-medium ${getRateColor(metrics.createPerSecond)}`}>
+                {formatRate(metrics.createPerSecond)}
+              </div>
             </div>
+            <div className="text-2xl font-bold tracking-tight mt-1">{formatNumber(metrics.totalCreates)}</div>
           </div>
 
-          <div className="space-y-2 p-3 rounded-lg bg-muted/50">
-            <div className="text-sm font-medium text-muted-foreground">Deletes</div>
-            <div className="text-3xl font-bold tracking-tight">{formatNumber(metrics.totalDeletes)}</div>
-            <div className={`text-sm ${getRateColor(metrics.deletePerSecond)}`}>
-              {formatRate(metrics.deletePerSecond)}
+          <div className="p-2 rounded-lg bg-muted/50">
+            <div className="flex items-center justify-between">
+              <div className="text-sm font-medium text-muted-foreground">Deletes</div>
+              <div className={`text-sm font-medium ${getRateColor(metrics.deletePerSecond)}`}>
+                {formatRate(metrics.deletePerSecond)}
+              </div>
             </div>
+            <div className="text-2xl font-bold tracking-tight mt-1">{formatNumber(metrics.totalDeletes)}</div>
           </div>
         </div>
 
-        <div className="space-y-3">
+        {/* Collections - now more compact */}
+        <div className="space-y-2">
           <h2 className="font-semibold text-sm">Collections</h2>
-          <ScrollArea className="h-[250px]">
-            <div className="space-y-0">
+          <ScrollArea className="h-[200px]">
+            <div className="space-y-1">
               {Object.entries(metrics.messagesByCollection)
                 .sort(([, a], [, b]) => b - a)
                 .map(([collection, count]) => (
                   <div
                     key={collection}
-                    className="flex items-center justify-between py-2 px-1.5 rounded-sm hover:bg-muted/50"
+                    className="flex items-center justify-between py-1.5 px-2 rounded-sm hover:bg-muted/50"
                   >
-                    <div className="text-sm font-mono truncate flex-1">{collection}</div>
-                    <div className="text-sm tabular-nums flex items-center gap-3">
+                    <div className="text-xs font-mono truncate flex-1">{collection.split('.').pop()}</div>
+                    <div className="text-xs tabular-nums flex items-center gap-2">
                       <span className="font-medium">{formatNumber(count)}</span>
                       <span className={`${getRateColor(metrics.collectionRates[collection] || 0)}`}>
                         {formatRate(metrics.collectionRates[collection] || 0)}

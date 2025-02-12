@@ -1,7 +1,7 @@
 import { Button } from './ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { JetstreamConfig } from '@/types/jetstream'
-import { Copy, Terminal, Globe, Code } from 'lucide-react'
+import { Copy } from 'lucide-react'
 
 export function ConnectionString({ options }: { options: JetstreamConfig }) {
   const connectionStrings = buildConnectionString(options)
@@ -13,26 +13,23 @@ export function ConnectionString({ options }: { options: JetstreamConfig }) {
 
         <Tabs defaultValue="raw" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="raw" className="flex items-center gap-2">
-              <Globe size={14} />
-              Raw URL
+            <TabsTrigger value="raw" className="flex items-center gap-2 text-xs">
+              URL
             </TabsTrigger>
-            <TabsTrigger value="websocat" className="flex items-center gap-2">
-              <Terminal size={14} />
-              Websocat
-            </TabsTrigger>
-            <TabsTrigger value="javascript" className="flex items-center gap-2">
-              <Code size={14} />
+            <TabsTrigger value="javascript" className="flex items-center gap-2 text-xs">
               JavaScript
+            </TabsTrigger>
+            <TabsTrigger value="websocat" className="flex items-center gap-2 text-xs">
+              Websocat
             </TabsTrigger>
           </TabsList>
 
           {['raw', 'websocat', 'javascript'].map((tab) => (
             <TabsContent key={tab} value={tab} className="space-y-2">
               <div className="relative">
-                <pre className="text-xs bg-muted/50 p-4 rounded-lg overflow-x-auto font-mono">
+                <div className="text-xs bg-muted/50 p-4 rounded-lg overflow-x-auto font-mono">
                   <code>{connectionStrings[tab as keyof typeof connectionStrings]}</code>
-                </pre>
+                </div>
                 <Button
                   size="icon"
                   variant="ghost"
@@ -75,7 +72,7 @@ function buildConnectionString(options: JetstreamConfig) {
   // }
 
   const queryString = params.toString()
-  const baseUrl = 'wss://jetstream1.us-east.bsky.network/subscribe'
+  const baseUrl = `wss://${options.instance}/subscribe`
   return {
     raw: `${baseUrl}${queryString ? '?' + queryString : ''}`,
     websocat: `websocat '${baseUrl}${queryString ? '\\?' + queryString : ''}'`,

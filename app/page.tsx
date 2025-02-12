@@ -109,11 +109,6 @@ export default function Home() {
       <div className="container mx-auto p-4 max-w-7xl">
         <div className="space-y-4">
           <div className="flex items-center gap-2">
-            <ConnectionControls
-              hasEverConnected={hasEverConnected}
-              connectionState={connectionState}
-              setConnectionState={setConnectionState}
-            />
             <div className="text-sm">Explore the Jetstream firehose and Bluesky HTTP APIs</div>
           </div>
 
@@ -125,14 +120,17 @@ export default function Home() {
                   options={connectionOptions}
                   setOptions={setConnectionOptions}
                 />
-              </Card>
-              <Card>
                 <ConnectionString options={connectionOptions} />
+                <ConnectionControls
+                  hasEverConnected={hasEverConnected}
+                  connectionState={connectionState}
+                  setConnectionState={setConnectionState}
+                />
               </Card>
             </div>
-            <Card className="md:col-span-6">
+            <div className="md:col-span-6">
               <StreamViewer messages={jetstream.messages} filteredMessages={filteredMessages} />
-            </Card>
+            </div>
             <div className="md:col-span-3 space-y-3">
               <Card>
                 <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
