@@ -1,61 +1,61 @@
 import { useState, useEffect, useRef } from 'react'
-import type { JetstreamEvent, JetstreamMetrics } from '@/lib/playground/jetstream/types'
+import type { JetstreamEvent } from '@/lib/playground/jetstream/types'
 
 const RATE_WINDOW = 5000 // 5 second window for rate calculation
-const UPDATE_INTERVAL = 1000 // Update rates every second
+const UPDATE_INTERVAL = 500 // Update rates every second
 const DECAY_FACTOR = 0.8 // How quickly rates decay when no new messages arrive
 
-export function useMetrics(messages: JetstreamEvent[]) {
-  const [metrics, setMetrics] = useState<JetstreamMetrics>({
+export function useMetrics() {
+  // Split the metrics into two states - one for totals and one for rates
+  const [totals, setTotals] = useState({
     totalMessages: 0,
-    messagesByCollection: {},
+    messagesByCollection: {} as Record<string, number>,
     totalCreates: 0,
     totalDeletes: 0,
+  })
+
+  const [rates, setRates] = useState({
     messagesPerSecond: 0,
     createPerSecond: 0,
     deletePerSecond: 0,
-    collectionRates: {},
+    collectionRates: {} as Record<string, number>,
     lastUpdate: Date.now(),
   })
 
   // Keep track of recent messages for rate calculations
   const recentMessagesRef = useRef<{ timestamp: number; collection?: string; operation?: string }[]>([])
 
-  // Process new messages
-  useEffect(() => {
-    if (messages.length === 0) return
+  // Handle new messages via callback
+  const handleMessage = (message: JetstreamEvent) => {
+    if (message.kind === 'commit') {
+      const collection = message.commit.collection
+      const operation = message.commit.operation
 
-    // Get the latest message
-    const latestMessage = messages[messages.length - 1]
+      setTotals((prev) => ({
+        totalMessages: prev.totalMessages + 1,
+        messagesByCollection: {
+          ...prev.messagesByCollection,
+          [collection]: (prev.messagesByCollection[collection] || 0) + 1,
+        },
+        totalCreates: prev.totalCreates + (operation === 'create' ? 1 : 0),
+        totalDeletes: prev.totalDeletes + (operation === 'delete' ? 1 : 0),
+      }))
+    } else {
+      setTotals((prev) => ({
+        ...prev,
+        totalMessages: prev.totalMessages + 1,
+      }))
+    }
 
-    // Update totals
-    setMetrics((prev) => {
-      const newMetrics = { ...prev }
-      newMetrics.totalMessages++
-
-      if (latestMessage.kind === 'commit') {
-        const collection = latestMessage.commit.collection
-        newMetrics.messagesByCollection[collection] = (newMetrics.messagesByCollection[collection] || 0) + 1
-
-        if (latestMessage.commit.operation === 'create') {
-          newMetrics.totalCreates++
-        } else if (latestMessage.commit.operation === 'delete') {
-          newMetrics.totalDeletes++
-        }
-      }
-
-      // Add to recent messages
-      recentMessagesRef.current.push({
-        timestamp: Date.now(),
-        collection: latestMessage.kind === 'commit' ? latestMessage.commit.collection : undefined,
-        operation: latestMessage.kind === 'commit' ? latestMessage.commit.operation : undefined,
-      })
-
-      return newMetrics
+    // Add to recent messages for rate calculation
+    recentMessagesRef.current.push({
+      timestamp: Date.now(),
+      collection: message.kind === 'commit' ? message.commit.collection : undefined,
+      operation: message.kind === 'commit' ? message.commit.operation : undefined,
     })
-  }, [messages])
+  }
 
-  // Periodically update rates and clean up old messages
+  // Periodically update only the rates
   useEffect(() => {
     const updateRates = () => {
       const now = Date.now()
@@ -64,41 +64,48 @@ export function useMetrics(messages: JetstreamEvent[]) {
       // Remove old messages
       recentMessagesRef.current = recentMessagesRef.current.filter((msg) => msg.timestamp > cutoff)
 
-      setMetrics((prev) => {
-        const newMetrics = { ...prev }
+      setRates((prev) => {
         const windowSeconds = RATE_WINDOW / 1000
 
         // If no recent messages, decay the rates
         if (recentMessagesRef.current.length === 0) {
-          newMetrics.messagesPerSecond *= DECAY_FACTOR
-          newMetrics.createPerSecond *= DECAY_FACTOR
-          newMetrics.deletePerSecond *= DECAY_FACTOR
-          Object.keys(newMetrics.collectionRates).forEach((collection) => {
-            newMetrics.collectionRates[collection] *= DECAY_FACTOR
-          })
-        } else {
-          // Calculate new rates
-          newMetrics.messagesPerSecond = recentMessagesRef.current.length / windowSeconds
-
-          // Calculate operation rates
-          const recentCreates = recentMessagesRef.current.filter((m) => m.operation === 'create').length
-          const recentDeletes = recentMessagesRef.current.filter((m) => m.operation === 'delete').length
-          newMetrics.createPerSecond = recentCreates / windowSeconds
-          newMetrics.deletePerSecond = recentDeletes / windowSeconds
-
-          // Calculate collection rates
-          const collections = new Set(recentMessagesRef.current.map((m) => m.collection).filter(Boolean))
-          newMetrics.collectionRates = {}
-          collections.forEach((collection) => {
-            if (collection) {
-              const count = recentMessagesRef.current.filter((m) => m.collection === collection).length
-              newMetrics.collectionRates[collection] = count / windowSeconds
-            }
-          })
+          return {
+            messagesPerSecond: prev.messagesPerSecond * DECAY_FACTOR,
+            createPerSecond: prev.createPerSecond * DECAY_FACTOR,
+            deletePerSecond: prev.deletePerSecond * DECAY_FACTOR,
+            collectionRates: Object.fromEntries(
+              Object.entries(prev.collectionRates).map(([k, v]) => [k, v * DECAY_FACTOR])
+            ),
+            lastUpdate: now,
+          }
         }
 
-        newMetrics.lastUpdate = now
-        return newMetrics
+        // Calculate new rates
+        const messagesPerSecond = recentMessagesRef.current.length / windowSeconds
+
+        // Calculate operation rates
+        const recentCreates = recentMessagesRef.current.filter((m) => m.operation === 'create').length
+        const recentDeletes = recentMessagesRef.current.filter((m) => m.operation === 'delete').length
+        const createPerSecond = recentCreates / windowSeconds
+        const deletePerSecond = recentDeletes / windowSeconds
+
+        // Calculate collection rates
+        const collections = new Set(recentMessagesRef.current.map((m) => m.collection).filter(Boolean))
+        const collectionRates: Record<string, number> = {}
+        collections.forEach((collection) => {
+          if (collection) {
+            const count = recentMessagesRef.current.filter((m) => m.collection === collection).length
+            collectionRates[collection] = count / windowSeconds
+          }
+        })
+
+        return {
+          messagesPerSecond,
+          createPerSecond,
+          deletePerSecond,
+          collectionRates,
+          lastUpdate: now,
+        }
       })
     }
 
@@ -106,5 +113,12 @@ export function useMetrics(messages: JetstreamEvent[]) {
     return () => clearInterval(interval)
   }, [])
 
-  return metrics
+  // Combine the states for the return value
+  return {
+    metrics: {
+      ...totals,
+      ...rates,
+    },
+    onMessage: handleMessage,
+  }
 }

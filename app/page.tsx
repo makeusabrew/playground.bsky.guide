@@ -9,6 +9,7 @@ import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
 import LiveFilters, { FilterOptions, COMMON_COLLECTIONS } from '@/components/live-filters'
 import ConnectionControls from '@/components/connection-controls'
+import { useMetrics } from './hooks/use-metrics'
 
 export type ConnectionState = {
   connected: boolean
@@ -41,7 +42,9 @@ export default function Home() {
     didFilter: '',
   })
 
-  const jetstream = useJetstream(connectionOptions)
+  const { metrics, onMessage } = useMetrics()
+
+  const jetstream = useJetstream({ ...connectionOptions, onMessage })
 
   useEffect(() => {
     if (connectionState.connected) {
@@ -57,7 +60,6 @@ export default function Home() {
     }
   }, [connectionState])
 
-  // Remove shimmer after 5 seconds if user hasn't connected
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowShimmer(false)
@@ -122,7 +124,7 @@ export default function Home() {
                 <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
               </Card>
               <Card>
-                <MetricsDisplay messages={jetstream.messages} />
+                <MetricsDisplay metrics={metrics} />
               </Card>
             </div>
           </div>

@@ -5,7 +5,11 @@ import { JetstreamConfig } from '@/types/jetstream'
 
 type JetstreamStatus = 'disconnected' | 'connecting' | 'connected' | 'paused'
 
-export const useJetstream = (options: JetstreamConfig) => {
+type UseJetstreamOptions = JetstreamConfig & {
+  onMessage?: (event: JetstreamEvent) => void
+}
+
+export const useJetstream = (options: UseJetstreamOptions) => {
   const [status, setStatus] = useState<JetstreamStatus>('disconnected')
   const [error, setError] = useState<Error | undefined>()
   const [messages, setMessages] = useState<JetstreamEvent[]>([])
@@ -34,6 +38,7 @@ export const useJetstream = (options: JetstreamConfig) => {
         const newMessages = [...prev, event]
         return newMessages.slice(-limit)
       })
+      options.onMessage?.(event)
     },
     onError: (error) => {
       setError(error)
