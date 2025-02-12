@@ -5,7 +5,7 @@ Bluesky HTTP APIs.
 
 We are using Tailwind CSS v3. Please make extensive use of shadcn/ui components.
 
-Please do not use Title Case Like This For Headings. It's really annoying.
+Please do not use Title Case Like This For Headings. Just use normal sentence case.
 
 It is styled as a developer playground, so it should feature lots of configuration options and useful
 output and stats and metrics. Below follows the official README for the Jetstream project from GitHub:

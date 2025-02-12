@@ -24,12 +24,8 @@ export default function Home() {
 
               <TabsContent value="stream" className="space-y-4">
                 <div className="grid gap-4 md:grid-cols-[400px_1fr]">
-                  <div className="space-y-4">
-                    <ConnectionConfig />
-                  </div>
-                  <div>
-                    <StreamViewer />
-                  </div>
+                  <ConnectionConfig />
+                  <StreamViewer />
                 </div>
               </TabsContent>
 
