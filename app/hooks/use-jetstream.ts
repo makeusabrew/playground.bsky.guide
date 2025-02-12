@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
 import { createJetstreamConsumer } from '@/lib/playground/jetstream/consumer'
+import { createMetricsManager } from '@/lib/playground/jetstream/metrics-manager'
 import type { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { JetstreamConfig } from '@/types/jetstream'
 
@@ -34,18 +35,18 @@ export const useJetstream = (options: JetstreamConfig) => {
     .map((d) => d.trim())
     .filter(Boolean)
 
-  // Create consumer with initial options
+  const metricsManager = createMetricsManager((newMetrics) => setMetrics(newMetrics))
+
   const consumer = createJetstreamConsumer({
     instance: options.instance,
     collections,
     dids,
     cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
-    // compression: options.compression,
     compression: false,
+    metricsManager,
     onEvent: (event) => {
       setMessages((prev) => {
         const newMessages = [...prev, JSON.stringify(event, null, 2)]
-        // Keep only the most recent messages up to the limit
         return newMessages.slice(-limit)
       })
     },
@@ -56,28 +57,7 @@ export const useJetstream = (options: JetstreamConfig) => {
       setStatus(state.status)
       setError(state.error)
     },
-    onMetrics: (newMetrics) => {
-      setMetrics(newMetrics)
-    },
   })
-
-  // Update consumer when options change
-  // useEffect(() => {
-  //   consumer.updateOptions({
-  //     instance: options.instance,
-  //     collections: options.collections
-  //       ?.split(',')
-  //       .map((c) => c.trim())
-  //       .filter(Boolean),
-  //     dids: options.dids
-  //       ?.split(',')
-  //       .map((d) => d.trim())
-  //       .filter(Boolean),
-  //     cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
-  //     // compression: options.compression,
-  //     compression: false,
-  //   })
-  // }, [options.instance, options.collections, options.dids, options.cursor])
 
   const connect = useCallback(() => {
     setMessages([])

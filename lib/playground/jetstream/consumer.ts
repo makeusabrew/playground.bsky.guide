@@ -1,5 +1,6 @@
-import type { JetstreamEvent, JetstreamMetrics } from './types'
+import type { JetstreamEvent } from './types'
 import { createWebSocketClient } from './client'
+import type { MetricsManager } from './metrics-manager'
 
 type ConsumerOptions = {
   instance: string
@@ -7,10 +8,10 @@ type ConsumerOptions = {
   dids?: string[]
   cursor?: number
   compression?: boolean
+  metricsManager: MetricsManager
   onEvent?: (event: JetstreamEvent) => void
   onError?: (error: Error) => void
   onStateChange?: (state: ConsumerState) => void
-  onMetrics?: (metrics: JetstreamMetrics) => void
 }
 
 type ConsumerState = {
@@ -21,79 +22,9 @@ type ConsumerState = {
 }
 
 export const createJetstreamConsumer = (options: ConsumerOptions) => {
-  console.log(`createJetstreamConsumer options`, options)
   let state: ConsumerState = {
     status: 'disconnected',
     intentionalDisconnect: false,
-  }
-
-  // Metrics state
-  const metrics: JetstreamMetrics = {
-    totalMessages: 0,
-    messagesByCollection: {},
-    totalCreates: 0,
-    totalDeletes: 0,
-    messagesPerSecond: 0,
-    createPerSecond: 0,
-    deletePerSecond: 0,
-    collectionRates: {},
-    lastUpdate: Date.now(),
-  }
-
-  // Recent events for rate calculation
-  const recentMessages: { timestamp: number; collection?: string; operation?: string }[] = []
-  const RATE_WINDOW = 5000 // 5 second window for rate calculation
-
-  const updateMetrics = (event: JetstreamEvent) => {
-    // Update totals
-    metrics.totalMessages++
-
-    if (event.kind === 'commit') {
-      const collection = event.commit.collection
-      metrics.messagesByCollection[collection] = (metrics.messagesByCollection[collection] || 0) + 1
-
-      if (event.commit.operation === 'create') {
-        metrics.totalCreates++
-      } else if (event.commit.operation === 'delete') {
-        metrics.totalDeletes++
-      }
-    }
-
-    // Add to recent messages
-    recentMessages.push({
-      timestamp: Date.now(),
-      collection: event.kind === 'commit' ? event.commit.collection : undefined,
-      operation: event.kind === 'commit' ? event.commit.operation : undefined,
-    })
-
-    // Remove old messages
-    const cutoff = Date.now() - RATE_WINDOW
-    while (recentMessages.length > 0 && recentMessages[0].timestamp < cutoff) {
-      recentMessages.shift()
-    }
-
-    // Calculate rates
-    const windowSeconds = RATE_WINDOW / 1000
-    metrics.messagesPerSecond = recentMessages.length / windowSeconds
-
-    // Calculate operation rates
-    const recentCreates = recentMessages.filter((m) => m.operation === 'create').length
-    const recentDeletes = recentMessages.filter((m) => m.operation === 'delete').length
-    metrics.createPerSecond = recentCreates / windowSeconds
-    metrics.deletePerSecond = recentDeletes / windowSeconds
-
-    // Calculate collection rates
-    const collections = new Set(recentMessages.map((m) => m.collection).filter(Boolean))
-    metrics.collectionRates = {}
-    collections.forEach((collection) => {
-      if (collection) {
-        const count = recentMessages.filter((m) => m.collection === collection).length
-        metrics.collectionRates[collection] = count / windowSeconds
-      }
-    })
-
-    metrics.lastUpdate = Date.now()
-    options.onMetrics?.(metrics)
   }
 
   const buildConnectionUrl = () => {
@@ -130,7 +61,7 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
       try {
         const event = JSON.parse(data) as JetstreamEvent
         updateState({ cursor: event.time_us })
-        updateMetrics(event)
+        options.metricsManager.updateMetrics(event)
         options.onEvent?.(event)
       } catch (err: unknown) {
         console.error(`Failed to parse Jetstream event`, err)
@@ -154,6 +85,7 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
 
   const start = () => {
     updateState({ status: 'connecting', intentionalDisconnect: false })
+    options.metricsManager.reset()
     wsClient.connect()
   }
 
@@ -183,6 +115,6 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
     resume,
     updateOptions,
     getState: () => ({ ...state }),
-    getMetrics: () => ({ ...metrics }),
+    getMetrics: () => options.metricsManager.getMetrics(),
   }
 }
