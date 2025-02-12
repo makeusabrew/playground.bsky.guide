@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
         <header className="sticky top-0 z-50 w-full border-b  bg-white">
-          <div className="container flex h-14 max-w-7xl items-center px-6">
+          <div className="container flex h-14 max-w-7xl items-center px-6 mx-auto">
             <div className="flex flex-1 items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Link

@@ -12,6 +12,7 @@ import LiveFilters, { FilterOptions, COMMON_COLLECTIONS } from '@/components/liv
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState(false)
+  const [showShimmer, setShowShimmer] = useState(true)
   const [connectionOptions, setConnectionOptions] = useState<JetstreamConfig>({
     // Default options here
     instance: 'jetstream1.us-east.bsky.network',
@@ -36,10 +37,19 @@ export default function Home() {
   useEffect(() => {
     if (isConnected) {
       jetstream.connect()
+      setShowShimmer(false)
     } else {
       jetstream.disconnect()
     }
   }, [isConnected])
+
+  // Remove shimmer after 5 seconds if user hasn't connected
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowShimmer(false)
+    }, 4000)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Apply filters to messages
   const filteredMessages = jetstream.messages.filter((msg) => {
@@ -81,15 +91,19 @@ export default function Home() {
 
   return (
     <main className="flex-1">
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="space-y-6">
-          <div className="space-y-0">
-            <h1 className="text-3xl font-bold tracking-tight sr-only">Bluesky Jetstream playground</h1>
-            <p>Explore and experiment with the Bluesky Jetstream Firehose and HTTP APIs</p>
+      <div className="container mx-auto p-4 max-w-7xl">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <Card className="md:col-span-2">
+              <MetricsDisplay metrics={metrics} />
+            </Card>
+            <Card className="md:col-span-3">
+              <StreamViewer messages={filteredMessages} />
+            </Card>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-            <Card className="md:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <Card className={`md:col-span-2 ${showShimmer ? 'animate-shimmer' : ''}`}>
               <ConnectionConfig
                 isConnected={isConnected}
                 options={connectionOptions}
@@ -100,15 +114,6 @@ export default function Home() {
             <Card className="md:col-span-3">
               <ConnectionString options={connectionOptions} />
               <LiveFilters filters={filters} onFiltersChange={setFilters} />
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-            <Card className="md:col-span-2">
-              <MetricsDisplay metrics={metrics} />
-            </Card>
-            <Card className="md:col-span-3">
-              <StreamViewer messages={filteredMessages} />
             </Card>
           </div>
         </div>
