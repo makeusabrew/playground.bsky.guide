@@ -1,10 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
 import MetricsDisplay from '@/components/metrics-display'
-import { JetstreamProvider } from '@/app/context/JetstreamContext'
 import { JetstreamConfig } from '@/types/jetstream'
+import { useJetstream } from './hooks/use-jetstream'
+import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState(false)
@@ -17,6 +18,28 @@ export default function Home() {
     messageLimit: '1000',
   })
 
+  const jetstream = useJetstream(connectionOptions)
+
+  useEffect(() => {
+    if (isConnected) {
+      jetstream.connect()
+    } else {
+      jetstream.disconnect()
+    }
+  }, [isConnected])
+
+  // FIXME: need to build a new object otherwise the metrics display doesn't re-render
+  const metrics: JetstreamMetrics = {
+    totalMessages: jetstream.metrics.totalMessages,
+    messagesPerSecond: jetstream.metrics.messagesPerSecond,
+    totalCreates: jetstream.metrics.totalCreates,
+    createPerSecond: jetstream.metrics.createPerSecond,
+    totalDeletes: jetstream.metrics.totalDeletes,
+    deletePerSecond: jetstream.metrics.deletePerSecond,
+    messagesByCollection: jetstream.metrics.messagesByCollection,
+    collectionRates: jetstream.metrics.collectionRates,
+    lastUpdate: jetstream.metrics.lastUpdate,
+  }
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
@@ -36,12 +59,10 @@ export default function Home() {
               setIsConnected={setIsConnected}
             />
 
-            <JetstreamProvider options={connectionOptions} isConnected={isConnected}>
-              <div className="space-y-6">
-                <MetricsDisplay />
-                <StreamViewer />
-              </div>
-            </JetstreamProvider>
+            <div className="space-y-6">
+              <MetricsDisplay metrics={metrics} />
+              <StreamViewer messages={jetstream.messages} />
+            </div>
           </div>
         </div>
       </main>

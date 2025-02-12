@@ -1,10 +1,8 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { useJetstreamContext } from '@/app/context/JetstreamContext'
 
-export default function StreamViewer() {
-  const { messages } = useJetstreamContext()
+export default function StreamViewer({ messages }: { messages: string[] }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [autoScroll, setAutoScroll] = useState(true)
   const userScrollRef = useRef(false)

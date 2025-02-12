@@ -17,7 +17,6 @@ type WebSocketClientState = {
 }
 
 export const createWebSocketClient = (options: WebSocketClientOptions) => {
-  console.log(`createWebSocketClient options`, options.url)
   let ws: WebSocket | null = null
   let state: WebSocketClientState = {
     isConnected: false,
@@ -25,6 +24,8 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
   }
 
   const getState = () => ({ ...state })
+
+  console.log(`WS working URL`, options.url)
 
   const connect = () => {
     if (ws?.readyState === WebSocket.OPEN) return
@@ -42,22 +43,19 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
     }
 
     ws.onmessage = (event) => {
-      try {
-        // Update cursor from message if present
-        const data = JSON.parse(event.data)
-        if ('time_us' in data) {
-          state = {
-            ...state,
-            lastCursor: data.time_us,
-          }
+      // Update cursor from message if present
+      const data = JSON.parse(event.data)
+      if ('time_us' in data) {
+        state = {
+          ...state,
+          lastCursor: data.time_us,
         }
-        options.onMessage?.(event.data)
-      } catch (err: unknown) {
-        options.onError?.(new Error('Failed to parse message'))
       }
+      options.onMessage?.(event.data)
     }
 
-    ws.onerror = (error: unknown) => {
+    ws.onerror = (error: Event) => {
+      console.warn(`WebSocket error: ${error}`)
       options.onError?.(new Error('WebSocket error'))
     }
 

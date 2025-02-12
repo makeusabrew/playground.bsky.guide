@@ -1,6 +1,6 @@
 'use client'
 import { Card } from '@/components/ui/card'
-import { useJetstreamContext } from '@/app/context/JetstreamContext'
+import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 
 function formatNumber(num: number): string {
   if (num === 0) return '0'
@@ -12,9 +12,7 @@ function formatRate(rate: number): string {
   return `${formatNumber(rate)}/s`
 }
 
-export default function MetricsDisplay() {
-  const { metrics } = useJetstreamContext()
-
+export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics }) {
   return (
     <Card className="p-4">
       <div className="space-y-4">

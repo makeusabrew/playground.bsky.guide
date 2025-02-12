@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { createJetstreamConsumer } from '@/lib/playground/jetstream/consumer'
 import type { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { JetstreamConfig } from '@/types/jetstream'
@@ -24,17 +24,21 @@ export const useJetstream = (options: JetstreamConfig) => {
   // Parse message limit with fallback
   const limit = Math.max(1, Math.min(100000, parseInt(options.messageLimit || '1000', 10)))
 
+  const collections = options.collections
+    ?.split(',')
+    .map((c) => c.trim())
+    .filter(Boolean)
+
+  const dids = options.dids
+    ?.split(',')
+    .map((d) => d.trim())
+    .filter(Boolean)
+
   // Create consumer with initial options
   const consumer = createJetstreamConsumer({
     instance: options.instance,
-    collections: options.collections
-      ?.split(',')
-      .map((c) => c.trim())
-      .filter(Boolean),
-    dids: options.dids
-      ?.split(',')
-      .map((d) => d.trim())
-      .filter(Boolean),
+    collections,
+    dids,
     cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
     // compression: options.compression,
     compression: false,
@@ -58,31 +62,31 @@ export const useJetstream = (options: JetstreamConfig) => {
   })
 
   // Update consumer when options change
-  useEffect(() => {
-    consumer.updateOptions({
-      instance: options.instance,
-      collections: options.collections
-        ?.split(',')
-        .map((c) => c.trim())
-        .filter(Boolean),
-      dids: options.dids
-        ?.split(',')
-        .map((d) => d.trim())
-        .filter(Boolean),
-      cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
-      // compression: options.compression,
-      compression: false,
-    })
-  }, [options.instance, options.collections, options.dids, options.cursor])
+  // useEffect(() => {
+  //   consumer.updateOptions({
+  //     instance: options.instance,
+  //     collections: options.collections
+  //       ?.split(',')
+  //       .map((c) => c.trim())
+  //       .filter(Boolean),
+  //     dids: options.dids
+  //       ?.split(',')
+  //       .map((d) => d.trim())
+  //       .filter(Boolean),
+  //     cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
+  //     // compression: options.compression,
+  //     compression: false,
+  //   })
+  // }, [options.instance, options.collections, options.dids, options.cursor])
 
   const connect = useCallback(() => {
     setMessages([])
     consumer.start()
-  }, [])
+  }, [consumer])
 
   const disconnect = useCallback(() => {
     consumer.pause()
-  }, [])
+  }, [consumer])
 
   return {
     status,

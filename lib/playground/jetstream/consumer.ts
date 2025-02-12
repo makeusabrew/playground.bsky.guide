@@ -28,7 +28,7 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
   }
 
   // Metrics state
-  let metrics: JetstreamMetrics = {
+  const metrics: JetstreamMetrics = {
     totalMessages: 0,
     messagesByCollection: {},
     totalCreates: 0,
@@ -133,6 +133,7 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
         updateMetrics(event)
         options.onEvent?.(event)
       } catch (err: unknown) {
+        console.error(`Failed to parse Jetstream event`, err)
         options.onError?.(new Error('Failed to parse Jetstream event'))
       }
     },
