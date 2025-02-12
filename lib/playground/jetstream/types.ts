@@ -1,14 +1,3 @@
-import { PostNotificationData } from '../types'
-
-export type JetstreamServers = readonly string[]
-
-export const JETSTREAM_SERVERS = [
-  'jetstream1.us-east.bsky.network',
-  'jetstream2.us-east.bsky.network',
-  'jetstream1.us-west.bsky.network',
-  'jetstream2.us-west.bsky.network',
-] as const
-
 interface BaseEvent {
   did: string
   time_us: number
