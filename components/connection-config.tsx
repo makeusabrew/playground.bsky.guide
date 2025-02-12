@@ -5,13 +5,13 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import type { ConnectionOptions } from '@/types/jetstream'
+import { JetstreamConfig } from '@/types/jetstream'
 
 interface ConnectionConfigProps {
   isConnected: boolean
   setIsConnected: (isConnected: boolean) => void
-  options: ConnectionOptions
-  setOptions: (options: ConnectionOptions) => void
+  options: JetstreamConfig
+  setOptions: (options: JetstreamConfig) => void
 }
 
 export default function ConnectionConfig({ isConnected, options, setOptions, setIsConnected }: ConnectionConfigProps) {
@@ -53,14 +53,11 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
             <Label>Wanted collections</Label>
             <Input
               placeholder="app.bsky.feed.post,app.bsky.feed.like"
-              value={options.wantedCollections.join(',')}
+              value={options.collections}
               onChange={(e) =>
                 setOptions({
                   ...options,
-                  wantedCollections: e.target.value
-                    .split(',')
-                    .map((c) => c.trim())
-                    .filter(Boolean),
+                  collections: e.target.value,
                 })
               }
             />
@@ -71,14 +68,11 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
             <Label>Wanted DIDs</Label>
             <Input
               placeholder="did:plc:1234,did:plc:5678"
-              value={options.wantedDids.join(',')}
+              value={options.dids}
               onChange={(e) =>
                 setOptions({
                   ...options,
-                  wantedDids: e.target.value
-                    .split(',')
-                    .map((d) => d.trim())
-                    .filter(Boolean),
+                  dids: e.target.value,
                 })
               }
             />
@@ -100,7 +94,7 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
             <p className="text-xs text-muted-foreground">Unix timestamp in microseconds to start from</p>
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label>Message size limit (bytes)</Label>
             <Input
               type="number"
@@ -115,7 +109,7 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
               }
             />
             <p className="text-xs text-muted-foreground">Maximum message size (0 = no limit)</p>
-          </div>
+          </div> */}
 
           {/* <div className="flex items-center space-x-2">
             <Switch id="compression" checked={compression} onCheckedChange={setCompression} />
@@ -190,27 +184,27 @@ export default function ConnectionConfig({ isConnected, options, setOptions, set
   )
 }
 
-function buildConnectionString(options: ConnectionOptions) {
+function buildConnectionString(options: JetstreamConfig) {
   const params = new URLSearchParams()
 
-  if (options.wantedCollections.length > 0) {
-    options.wantedCollections.forEach((c) => params.append('wantedCollections', c))
+  if (options.collections) {
+    options.collections.split(',').forEach((c) => params.append('wantedCollections', c))
   }
-  if (options.wantedDids.length > 0) {
-    options.wantedDids.forEach((d) => params.append('wantedDids', d))
+  if (options.dids) {
+    options.dids.split(',').forEach((d) => params.append('wantedDids', d))
   }
   if (options.cursor) {
     params.append('cursor', options.cursor)
   }
-  if (options.maxMessageSizeBytes > 0) {
-    params.append('maxMessageSizeBytes', options.maxMessageSizeBytes.toString())
-  }
-  if (options.compress) {
-    params.append('compress', 'true')
-  }
-  if (options.requireHello) {
-    params.append('requireHello', 'true')
-  }
+  // if (options.maxMessageSizeBytes > 0) {
+  //   params.append('maxMessageSizeBytes', options.maxMessageSizeBytes.toString())
+  // }
+  // if (options.compress) {
+  //   params.append('compress', 'true')
+  // }
+  // if (options.requireHello) {
+  //   params.append('requireHello', 'true')
+  // }
 
   const queryString = params.toString()
   const baseUrl = 'wss://jetstream1.us-east.bsky.network/subscribe'

@@ -1,15 +1,21 @@
 'use client'
 import { createContext, useContext, useEffect } from 'react'
 import { useJetstream } from '@/app/hooks/use-jetstream'
-import type { ConnectionOptions } from '@/types/jetstream'
+import { JetstreamConfig } from '@/types/jetstream'
+import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 
-type JetstreamContextType = ReturnType<typeof useJetstream>
+type JetstreamContextType = {
+  metrics: JetstreamMetrics
+  messages: string[]
+  status: string
+  error: Error | undefined
+}
 
 const JetstreamContext = createContext<JetstreamContextType | null>(null)
 
 interface JetstreamProviderProps {
   children: React.ReactNode
-  options: ConnectionOptions
+  options: JetstreamConfig
   isConnected: boolean
 }
 
@@ -24,7 +30,14 @@ export function JetstreamProvider({ children, options, isConnected }: JetstreamP
     }
   }, [isConnected])
 
-  return <JetstreamContext.Provider value={{ ...jetstream }}>{children}</JetstreamContext.Provider>
+  const contextValue: JetstreamContextType = {
+    metrics: jetstream.metrics,
+    messages: jetstream.messages,
+    status: jetstream.status,
+    error: jetstream.error,
+  }
+
+  return <JetstreamContext.Provider value={contextValue}>{children}</JetstreamContext.Provider>
 }
 
 export function useJetstreamContext() {

@@ -1,19 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createJetstreamConsumer } from '@/lib/playground/jetstream/consumer'
 import type { JetstreamMetrics } from '@/lib/playground/jetstream/types'
-
-type UseJetstreamOptions = {
-  instance: string
-  collections?: string
-  dids?: string
-  cursor?: string
-  compression?: boolean
-  messageLimit?: string
-}
+import { JetstreamConfig } from '@/types/jetstream'
 
 type JetstreamStatus = 'disconnected' | 'connecting' | 'connected' | 'paused'
 
-export const useJetstream = (options: UseJetstreamOptions) => {
+export const useJetstream = (options: JetstreamConfig) => {
   const [status, setStatus] = useState<JetstreamStatus>('disconnected')
   const [error, setError] = useState<Error | undefined>()
   const [messages, setMessages] = useState<string[]>([])
@@ -44,7 +36,8 @@ export const useJetstream = (options: UseJetstreamOptions) => {
       .map((d) => d.trim())
       .filter(Boolean),
     cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
-    compression: options.compression,
+    // compression: options.compression,
+    compression: false,
     onEvent: (event) => {
       setMessages((prev) => {
         const newMessages = [...prev, JSON.stringify(event, null, 2)]
@@ -77,9 +70,10 @@ export const useJetstream = (options: UseJetstreamOptions) => {
         .map((d) => d.trim())
         .filter(Boolean),
       cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
-      compression: options.compression,
+      // compression: options.compression,
+      compression: false,
     })
-  }, [options.instance, options.collections, options.dids, options.cursor, options.compression])
+  }, [options.instance, options.collections, options.dids, options.cursor])
 
   const connect = useCallback(() => {
     setMessages([])

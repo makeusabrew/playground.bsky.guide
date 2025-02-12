@@ -4,19 +4,17 @@ import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
 import MetricsDisplay from '@/components/metrics-display'
 import { JetstreamProvider } from '@/app/context/JetstreamContext'
-import type { ConnectionOptions } from '@/types/jetstream' // You'll need to create this type
+import { JetstreamConfig } from '@/types/jetstream'
 
 export default function Home() {
   const [isConnected, setIsConnected] = useState(false)
-  const [connectionOptions, setConnectionOptions] = useState<ConnectionOptions>({
+  const [connectionOptions, setConnectionOptions] = useState<JetstreamConfig>({
     // Default options here
     instance: 'jetstream1.us-east.bsky.network',
-    wantedCollections: [],
-    wantedDids: [],
-    maxMessageSizeBytes: 0,
+    collections: '',
+    dids: '',
     cursor: undefined,
-    compress: false,
-    requireHello: false,
+    messageLimit: '1000',
   })
 
   return (
