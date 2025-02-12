@@ -7,6 +7,7 @@ type WebSocketClientOptions = {
   autoReconnect?: boolean
   maxReconnectAttempts?: number
   reconnectDelay?: number
+  shouldReconnect?: () => boolean
 }
 
 type WebSocketClientState = {
@@ -49,12 +50,12 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
           }
         }
         options.onMessage?.(event.data)
-      } catch (err) {
+      } catch (err: unknown) {
         options.onError?.(new Error('Failed to parse message'))
       }
     }
 
-    ws.onerror = (error) => {
+    ws.onerror = (error: unknown) => {
       options.onError?.(new Error('WebSocket error'))
     }
 
@@ -67,7 +68,8 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
 
       if (
         options.autoReconnect &&
-        (!options.maxReconnectAttempts || state.reconnectAttempts < options.maxReconnectAttempts)
+        (!options.maxReconnectAttempts || state.reconnectAttempts < options.maxReconnectAttempts) &&
+        (options.shouldReconnect?.() ?? true)
       ) {
         state = {
           ...state,

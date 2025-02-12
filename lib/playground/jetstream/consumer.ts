@@ -16,11 +16,13 @@ type ConsumerState = {
   status: 'disconnected' | 'connecting' | 'connected' | 'paused'
   cursor?: number
   error?: Error
+  intentionalDisconnect?: boolean
 }
 
 export const createJetstreamConsumer = (options: ConsumerOptions) => {
   let state: ConsumerState = {
     status: 'disconnected',
+    intentionalDisconnect: false,
   }
 
   const buildConnectionUrl = () => {
@@ -56,25 +58,32 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
         const event = JSON.parse(data) as JetstreamEvent
         updateState({ cursor: event.time_us })
         options.onEvent?.(event)
-      } catch (err) {
+      } catch (err: unknown) {
         options.onError?.(new Error('Failed to parse Jetstream event'))
       }
     },
-    onOpen: () => updateState({ status: 'connected' }),
-    onClose: () => updateState({ status: 'disconnected' }),
-    onError: (error) => {
-      updateState({ status: 'disconnected', error })
-      options.onError?.(error)
+    onOpen: () => updateState({ status: 'connected', intentionalDisconnect: false }),
+    onClose: () => {
+      if (!state.intentionalDisconnect) {
+        updateState({ status: 'disconnected' })
+      }
     },
+    onError: (error) => {
+      if (!state.intentionalDisconnect) {
+        updateState({ status: 'disconnected', error })
+        options.onError?.(error)
+      }
+    },
+    shouldReconnect: () => !state.intentionalDisconnect,
   })
 
   const start = () => {
-    updateState({ status: 'connecting' })
+    updateState({ status: 'connecting', intentionalDisconnect: false })
     wsClient.connect()
   }
 
   const pause = () => {
-    updateState({ status: 'paused' })
+    updateState({ status: 'paused', intentionalDisconnect: true })
     wsClient.disconnect()
   }
 
@@ -87,7 +96,6 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
   const updateOptions = (newOptions: Partial<ConsumerOptions>) => {
     Object.assign(options, newOptions)
 
-    // Reconnect with new options if we're currently connected
     if (state.status === 'connected') {
       wsClient.disconnect()
       start()

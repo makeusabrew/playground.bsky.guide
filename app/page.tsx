@@ -13,6 +13,7 @@ export default function Home() {
     dids: '',
     cursor: '',
     compression: false,
+    messageLimit: '10000',
   })
 
   return (

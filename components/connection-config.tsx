@@ -15,6 +15,7 @@ export default function ConnectionConfig() {
   const [dids, setDids] = useState('')
   const [cursor, setCursor] = useState('')
   const [compression, setCompression] = useState(false)
+  const [messageLimit, setMessageLimit] = useState('10000')
 
   const { status, error, connect, disconnect } = useJetstreamContext()
   const isConnected = status === 'connected'
@@ -154,6 +155,19 @@ export default function ConnectionConfig() {
               <Label>cursor (microseconds)</Label>
               <Input placeholder="1725519626134432" value={cursor} onChange={(e) => setCursor(e.target.value)} />
               <p className="text-xs text-muted-foreground">Unix timestamp in microseconds to start from</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>message limit</Label>
+              <Input
+                type="number"
+                min="1"
+                max="100000"
+                placeholder="10000"
+                value={messageLimit}
+                onChange={(e) => setMessageLimit(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">Maximum number of messages to keep in memory</p>
             </div>
 
             <div className="flex items-center space-x-2">

@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createJetstreamConsumer } from '@/lib/playground/jetstream/consumer'
-import type { JetstreamEvent } from '@/lib/playground/jetstream/types'
 
 type UseJetstreamOptions = {
   instance: string
@@ -8,6 +7,7 @@ type UseJetstreamOptions = {
   dids?: string
   cursor?: string
   compression?: boolean
+  messageLimit?: string
 }
 
 type JetstreamStatus = 'disconnected' | 'connecting' | 'connected' | 'paused'
@@ -16,6 +16,9 @@ export const useJetstream = (options: UseJetstreamOptions) => {
   const [status, setStatus] = useState<JetstreamStatus>('disconnected')
   const [error, setError] = useState<Error | undefined>()
   const [messages, setMessages] = useState<string[]>([])
+
+  // Parse message limit with fallback
+  const limit = Math.max(1, Math.min(100000, parseInt(options.messageLimit || '10000', 10)))
 
   // Create consumer with initial options
   const consumer = createJetstreamConsumer({
@@ -31,7 +34,11 @@ export const useJetstream = (options: UseJetstreamOptions) => {
     cursor: options.cursor ? parseInt(options.cursor, 10) : undefined,
     compression: options.compression,
     onEvent: (event) => {
-      setMessages((prev) => [...prev, JSON.stringify(event, null, 2)])
+      setMessages((prev) => {
+        const newMessages = [...prev, JSON.stringify(event, null, 2)]
+        // Keep only the most recent messages up to the limit
+        return newMessages.slice(-limit)
+      })
     },
     onError: (error) => {
       setError(error)
