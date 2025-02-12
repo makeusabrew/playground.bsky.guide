@@ -1,10 +1,24 @@
 'use client'
+import { useState } from 'react'
 import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
 import MetricsDisplay from '@/components/metrics-display'
 import { JetstreamProvider } from '@/app/context/JetstreamContext'
+import type { ConnectionOptions } from '@/types/jetstream' // You'll need to create this type
 
 export default function Home() {
+  const [isConnected, setIsConnected] = useState(false)
+  const [connectionOptions, setConnectionOptions] = useState<ConnectionOptions>({
+    // Default options here
+    instance: 'jetstream1.us-east.bsky.network',
+    wantedCollections: [],
+    wantedDids: [],
+    maxMessageSizeBytes: 0,
+    cursor: undefined,
+    compress: false,
+    requireHello: false,
+  })
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1">
@@ -17,9 +31,15 @@ export default function Home() {
               </p>
             </div>
 
-            <JetstreamProvider>
+            <ConnectionConfig
+              isConnected={isConnected}
+              options={connectionOptions}
+              setOptions={setConnectionOptions}
+              setIsConnected={setIsConnected}
+            />
+
+            <JetstreamProvider options={connectionOptions} isConnected={isConnected}>
               <div className="space-y-6">
-                <ConnectionConfig />
                 <MetricsDisplay />
                 <StreamViewer />
               </div>
