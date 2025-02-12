@@ -59,9 +59,39 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [autoScroll, setAutoScroll] = useState(true)
   const userScrollRef = useRef(false)
+  const [lag, setLag] = useState<number | null>(null)
+  const latestMessageTimeRef = useRef<number | null>(null)
 
   // only render last 100 for our protection!
   const displayMessages = messages.slice(-100)
+
+  // Keep latest message time updated
+  useEffect(() => {
+    if (displayMessages.length > 0) {
+      latestMessageTimeRef.current = Math.floor(displayMessages[displayMessages.length - 1].time_us / 1000)
+    } else {
+      latestMessageTimeRef.current = null
+    }
+  }, [displayMessages])
+
+  // Update lag every second
+  useEffect(() => {
+    const updateLag = () => {
+      if (latestMessageTimeRef.current === null) {
+        setLag(null)
+        return
+      }
+      const now = Date.now()
+      setLag(now - latestMessageTimeRef.current)
+    }
+
+    // Initial update
+    updateLag()
+
+    // Update every second
+    const interval = setInterval(updateLag, 1000)
+    return () => clearInterval(interval)
+  }, []) // No dependencies needed - we use the ref
 
   // Handle auto-scrolling
   useEffect(() => {
@@ -133,9 +163,16 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
 
   return (
     <div className="h-[600px] flex flex-col">
-      <div className="p-3 border-b flex-none flex items-center gap-2">
-        <PlayCircle size={16} className="text-muted-foreground" />
-        <h2 className="font-semibold">Real-time message stream</h2>
+      <div className="p-3 border-b flex-none flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <PlayCircle size={16} className="text-muted-foreground" />
+          <h2 className="font-semibold">Real-time message stream</h2>
+        </div>
+        {lag !== null && (
+          <Badge variant="outline" className="text-xs">
+            Lag: {lag < 1000 ? `${lag}ms` : `${(lag / 1000).toFixed(1)}s`}
+          </Badge>
+        )}
       </div>
 
       <div
