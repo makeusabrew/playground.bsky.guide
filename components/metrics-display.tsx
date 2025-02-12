@@ -27,7 +27,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
         <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
           <div className="flex items-center gap-2">
             <Activity size={16} className="text-muted-foreground" />
-            <h2 className="font-semibold">Metrics</h2>
+            <h2 className="font-semibold">Stats</h2>
           </div>
           {metrics.totalMessages > 0 && (
             <Badge variant="outline" className="text-xs">
@@ -75,13 +75,14 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
           <ScrollArea className="h-[200px]">
             <div className="space-y-1">
               {Object.entries(metrics.messagesByCollection)
+                .filter(([a]) => a.startsWith('app.bsky.'))
                 .sort(([, a], [, b]) => b - a)
                 .map(([collection, count]) => (
                   <div
                     key={collection}
                     className="flex items-center justify-between py-1.5 px-2 rounded-sm hover:bg-muted/50"
                   >
-                    <div className="text-xs font-mono truncate flex-1">{collection.split('.').pop()}</div>
+                    <div className="text-xs font-mono truncate flex-1">{collection}</div>
                     <div className="text-xs tabular-nums flex items-center gap-2">
                       <span className="font-medium">{formatNumber(count)}</span>
                       <span className={`${getRateColor(metrics.collectionRates[collection] || 0)}`}>

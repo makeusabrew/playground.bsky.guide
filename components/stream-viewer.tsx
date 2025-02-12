@@ -163,11 +163,12 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   }
 
   const getLagStyles = (lagMs: number): string => {
-    if (lagMs <= 3000) return ''
-    if (lagMs <= 5000) return 'bg-amber-100 dark:bg-amber-900/20'
-    if (lagMs <= 10000) return 'bg-orange-100 dark:bg-orange-900/20'
-    if (lagMs <= 60000) return 'bg-red-100 dark:bg-red-900/20'
-    return 'bg-red-200 dark:bg-red-900/40'
+    if (lagMs <= 1000) return 'bg-green-50'
+    if (lagMs <= 3000) return 'bg-yellow-100'
+    if (lagMs <= 5000) return 'bg-amber-200'
+    if (lagMs <= 10000) return 'bg-orange-300'
+    if (lagMs <= 60000) return 'bg-red-300'
+    return 'bg-red-500'
   }
 
   return (

@@ -29,7 +29,7 @@ export default function Home() {
     collections: '',
     dids: '',
     cursor: undefined,
-    messageLimit: '10000',
+    messageLimit: '1000',
   })
 
   const [filters, setFilters] = useState<FilterOptions>({
@@ -108,9 +108,9 @@ export default function Home() {
     <main className="flex-1">
       <div className="container mx-auto p-4 max-w-7xl">
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <div className="text-sm">Explore the Jetstream firehose and Bluesky HTTP APIs</div>
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             <div className="md:col-span-3 space-y-3">
