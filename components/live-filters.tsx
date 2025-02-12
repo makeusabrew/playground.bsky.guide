@@ -65,7 +65,7 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
   return (
     <div className={`p-3 ${disabled ? 'opacity-100' : ''}`}>
       <div className="space-y-6">
-        <div className="space-y-2">
+        <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
           <h2 className="font-semibold flex items-center gap-2">
             <Filter size={16} className="text-muted-foreground" />
             Live filters

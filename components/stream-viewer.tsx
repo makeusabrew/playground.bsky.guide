@@ -14,11 +14,12 @@ import {
   Users,
   Ban,
   User,
-  PlayCircle,
+  ScrollText,
 } from 'lucide-react'
 
 interface StreamViewerProps {
   messages: JetstreamEvent[]
+  filteredMessages: JetstreamEvent[]
 }
 
 type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
@@ -55,7 +56,7 @@ const getCollectionIcon = (collection: string) => {
   }
 }
 
-export default function StreamViewer({ messages }: StreamViewerProps) {
+export default function StreamViewer({ messages, filteredMessages }: StreamViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [autoScroll, setAutoScroll] = useState(true)
   const userScrollRef = useRef(false)
@@ -63,7 +64,7 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
   const latestMessageTimeRef = useRef<number | null>(null)
 
   // only render last 100 for our protection!
-  const displayMessages = messages.slice(-100)
+  const displayMessages = filteredMessages.slice(-100)
 
   // Keep latest message time updated
   useEffect(() => {
@@ -161,15 +162,23 @@ export default function StreamViewer({ messages }: StreamViewerProps) {
     return 'outline'
   }
 
+  const getLagStyles = (lagMs: number): string => {
+    if (lagMs <= 3000) return ''
+    if (lagMs <= 5000) return 'bg-amber-100 dark:bg-amber-900/20'
+    if (lagMs <= 10000) return 'bg-orange-100 dark:bg-orange-900/20'
+    if (lagMs <= 60000) return 'bg-red-100 dark:bg-red-900/20'
+    return 'bg-red-200 dark:bg-red-900/40'
+  }
+
   return (
-    <div className="h-[600px] flex flex-col">
+    <div className="h-[500px] flex flex-col">
       <div className="p-3 border-b flex-none flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <PlayCircle size={16} className="text-muted-foreground" />
-          <h2 className="font-semibold">Real-time message stream</h2>
+          <ScrollText size={16} className="text-muted-foreground" />
+          <h2 className="font-semibold">Message stream</h2>
         </div>
         {lag !== null && (
-          <Badge variant="outline" className="text-xs">
+          <Badge variant="outline" className={`text-xs ${getLagStyles(lag)}`}>
             Lag: {lag < 1000 ? `${lag}ms` : `${(lag / 1000).toFixed(1)}s`}
           </Badge>
         )}

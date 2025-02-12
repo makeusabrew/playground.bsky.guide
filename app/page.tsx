@@ -9,6 +9,7 @@ import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
 import LiveFilters, { FilterOptions, COMMON_COLLECTIONS } from '@/components/live-filters'
+import ConnectionControls from '@/components/connection-controls'
 
 export type ConnectionState = {
   connected: boolean
@@ -107,21 +108,28 @@ export default function Home() {
     <main className="flex-1">
       <div className="container mx-auto p-4 max-w-7xl">
         <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <ConnectionControls
+              hasEverConnected={hasEverConnected}
+              connectionState={connectionState}
+              setConnectionState={setConnectionState}
+            />
+            <div className="text-sm">Explore the Jetstream firehose and Bluesky HTTP APIs</div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <Card className="md:col-span-2">
               <MetricsDisplay metrics={metrics} />
             </Card>
             <Card className="md:col-span-3">
-              <StreamViewer messages={filteredMessages} />
+              <StreamViewer messages={jetstream.messages} filteredMessages={filteredMessages} />
             </Card>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <Card className={`md:col-span-2 ${showShimmer ? 'animate-shimmer' : ''}`}>
               <ConnectionConfig
-                hasEverConnected={hasEverConnected}
                 connectionState={connectionState}
-                setConnectionState={setConnectionState}
                 options={connectionOptions}
                 setOptions={setConnectionOptions}
               />

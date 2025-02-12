@@ -1,34 +1,29 @@
 'use client'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { JetstreamConfig } from '@/types/jetstream'
 import { Badge } from '@/components/ui/badge'
-import { PauseCircle, PlayCircle, RotateCcw } from 'lucide-react'
+import { Settings } from 'lucide-react'
 import { ConnectionState } from '@/app/page'
 
 interface ConnectionConfigProps {
-  hasEverConnected: boolean
   connectionState: ConnectionState
-  setConnectionState: (connectionState: ConnectionState) => void
   options: JetstreamConfig
   setOptions: (options: JetstreamConfig) => void
 }
 
-export default function ConnectionConfig({
-  hasEverConnected,
-  connectionState,
-  setConnectionState,
-  options,
-  setOptions,
-}: ConnectionConfigProps) {
+export default function ConnectionConfig({ connectionState, options, setOptions }: ConnectionConfigProps) {
   const isConnected = connectionState.connected
+
   return (
     <div className="p-3">
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold">Connection settings</h2>
+        <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
+          <div className="flex items-center gap-2">
+            <Settings size={16} className="text-muted-foreground" />
+            <h2 className="font-semibold">Connection settings</h2>
+          </div>
           <Badge variant={isConnected ? 'default' : 'secondary'}>{isConnected ? 'Connected' : 'Disconnected'}</Badge>
         </div>
 
@@ -69,7 +64,7 @@ export default function ConnectionConfig({
                 })
               }
             />
-            <p className="text-xs text-muted-foreground">Comma-separated list of collections</p>
+            <p className="text-xs text-muted-foreground">Comma-separated list of collections (leave blank for all)</p>
           </div>
 
           <div className="space-y-2.5">
@@ -92,7 +87,7 @@ export default function ConnectionConfig({
             <Label className="text-sm">Cursor (microseconds)</Label>
             <Input
               className="font-mono text-sm"
-              placeholder="1725519626134432"
+              placeholder=""
               value={options.cursor || ''}
               onChange={(e) =>
                 setOptions({
@@ -101,73 +96,10 @@ export default function ConnectionConfig({
                 })
               }
             />
-            <p className="text-xs text-muted-foreground">Unix timestamp in microseconds to start from</p>
+            <p className="text-xs text-muted-foreground">
+              Unix timestamp in microseconds to start from (leave blank for latest)
+            </p>
           </div>
-
-          {/* <div className="space-y-2">
-            <Label>Message size limit (bytes)</Label>
-            <Input
-              type="number"
-              min="0"
-              placeholder="0"
-              value={options.maxMessageSizeBytes}
-              onChange={(e) =>
-                setOptions({
-                  ...options,
-                  maxMessageSizeBytes: parseInt(e.target.value) || 0,
-                })
-              }
-            />
-            <p className="text-xs text-muted-foreground">Maximum message size (0 = no limit)</p>
-          </div> */}
-
-          {/* <div className="flex items-center space-x-2">
-            <Switch id="compression" checked={compression} onCheckedChange={setCompression} />
-            <Label htmlFor="compression">enable compression</Label>
-          </div> */}
-
-          {isConnected ? (
-            <Button
-              className="w-full flex items-center gap-2"
-              onClick={() => setConnectionState({ connected: false, mode: 'restart' })}
-              variant="secondary"
-            >
-              <PauseCircle className="w-4 h-4" />
-              Disconnect
-            </Button>
-          ) : (
-            <>
-              {hasEverConnected ? (
-                <div className="gap-2 flex">
-                  <Button
-                    className="w-full flex items-center gap-2"
-                    onClick={() => setConnectionState({ connected: true, mode: 'resume' })}
-                    variant="outline"
-                  >
-                    <PlayCircle className="w-4 h-4" />
-                    Resume
-                  </Button>
-                  <Button
-                    className="w-full flex items-center gap-2"
-                    onClick={() => setConnectionState({ connected: true, mode: 'restart' })}
-                    variant="secondary"
-                  >
-                    <RotateCcw className="w-4 h-4" />
-                    Restart
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  className="w-full flex items-center gap-2"
-                  onClick={() => setConnectionState({ connected: true, mode: 'restart' })}
-                  variant="default"
-                >
-                  <PlayCircle className="w-4 h-4" />
-                  Connect
-                </Button>
-              )}
-            </>
-          )}
         </div>
       </div>
     </div>

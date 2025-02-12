@@ -27,7 +27,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
         <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
           <div className="flex items-center gap-2">
             <Activity size={16} className="text-muted-foreground" />
-            <h2 className="font-semibold">Real-time metrics</h2>
+            <h2 className="font-semibold">Metrics</h2>
           </div>
           {metrics.totalMessages > 0 && (
             <Badge variant="outline" className="text-xs">
@@ -64,7 +64,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
 
         <div className="space-y-3">
           <h2 className="font-semibold text-sm">Collections</h2>
-          <ScrollArea className="h-[300px]">
+          <ScrollArea className="h-[250px]">
             <div className="space-y-0">
               {Object.entries(metrics.messagesByCollection)
                 .sort(([, a], [, b]) => b - a)
