@@ -13,7 +13,6 @@ type WebSocketClientOptions = {
 type WebSocketClientState = {
   isConnected: boolean
   reconnectAttempts: number
-  lastCursor?: number // microseconds timestamp from last message
 }
 
 export const createWebSocketClient = (options: WebSocketClientOptions) => {
@@ -22,8 +21,6 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
     isConnected: false,
     reconnectAttempts: 0,
   }
-
-  const getState = () => ({ ...state })
 
   const connect = (cursor?: number) => {
     if (ws?.readyState === WebSocket.OPEN) return
@@ -34,7 +31,6 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
 
     ws.onopen = () => {
       state = {
-        ...state,
         isConnected: true,
         reconnectAttempts: 0,
       }
@@ -42,14 +38,6 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
     }
 
     ws.onmessage = (event) => {
-      // Update cursor from message if present
-      const data = JSON.parse(event.data)
-      if ('time_us' in data) {
-        state = {
-          ...state,
-          lastCursor: data.time_us,
-        }
-      }
       options.onMessage(event.data)
     }
 
@@ -96,6 +84,5 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
     connect,
     disconnect,
     send,
-    getState,
   }
 }

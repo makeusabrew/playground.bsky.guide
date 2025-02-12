@@ -109,6 +109,5 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
     pause,
     resume,
     updateOptions,
-    getState: () => ({ ...state }),
   }
 }

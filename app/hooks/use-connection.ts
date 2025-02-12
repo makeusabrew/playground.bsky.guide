@@ -1,7 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { JetstreamConfig } from '@/types/jetstream'
-import { useJetstream } from './use-jetstream'
-import { JetstreamEvent } from '@/lib/playground/jetstream/types'
 
 export type ConnectionState = {
   connected: boolean
@@ -16,8 +14,7 @@ const DEFAULT_CONNECTION_OPTIONS: JetstreamConfig = {
   messageLimit: '1000',
 }
 
-export function useConnection(onMessage?: (event: JetstreamEvent) => void) {
-  const [hasEverConnected, setHasEverConnected] = useState(false)
+export function useConnection() {
   const [connectionState, setConnectionState] = useState<ConnectionState>({
     connected: false,
     mode: 'restart',
@@ -25,28 +22,10 @@ export function useConnection(onMessage?: (event: JetstreamEvent) => void) {
 
   const [connectionOptions, setConnectionOptions] = useState(DEFAULT_CONNECTION_OPTIONS)
 
-  const jetstream = useJetstream({ ...connectionOptions, onMessage })
-
-  // Handle connection state changes
-  useEffect(() => {
-    if (connectionState.connected) {
-      if (connectionState.mode === 'restart') {
-        jetstream.connect()
-      } else {
-        jetstream.resume()
-      }
-      setHasEverConnected(true)
-    } else {
-      jetstream.disconnect()
-    }
-  }, [connectionState])
-
   return {
-    hasEverConnected,
     connectionState,
     setConnectionState,
     connectionOptions,
     setConnectionOptions,
-    messages: jetstream.messages,
   }
 }

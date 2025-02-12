@@ -10,13 +10,31 @@ import { useMetrics } from './hooks/use-metrics'
 import { useShimmer } from './hooks/use-shimmer'
 import { useConnection } from './hooks/use-connection'
 import { useFilters } from './hooks/use-filters'
+import { useJetstream } from './hooks/use-jetstream'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
   const showShimmer = useShimmer()
   const { metrics, onMessage } = useMetrics()
-  const { hasEverConnected, connectionState, setConnectionState, connectionOptions, setConnectionOptions, messages } =
-    useConnection(onMessage)
+  const [hasEverConnected, setHasEverConnected] = useState(false)
+  const { connectionState, setConnectionState, connectionOptions, setConnectionOptions } = useConnection()
+  const jetstream = useJetstream({ ...connectionOptions, onMessage })
+  const messages = jetstream.messages
   const { filters, setFilters, filteredMessages } = useFilters(messages)
+
+  // Handle connection state changes
+  useEffect(() => {
+    if (connectionState.connected) {
+      if (connectionState.mode === 'restart') {
+        jetstream.connect()
+      } else {
+        jetstream.resume()
+      }
+      setHasEverConnected(true)
+    } else {
+      jetstream.disconnect()
+    }
+  }, [connectionState])
 
   return (
     <main className="flex-1">
