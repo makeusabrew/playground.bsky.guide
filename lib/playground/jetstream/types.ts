@@ -127,11 +127,13 @@ export type JetstreamMetrics = {
   messagesByCollection: Record<string, number>
   totalCreates: number
   totalDeletes: number
+  totalNewAccounts: number
 
   // Rates (per second)
   messagesPerSecond: number
   createPerSecond: number
   deletePerSecond: number
+  newAccountsPerSecond: number
   collectionRates: Record<string, number>
 
   // For rate calculations

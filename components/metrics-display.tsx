@@ -21,6 +21,24 @@ function getRateColor(rate: number): string {
   return 'text-muted-foreground'
 }
 
+interface StatCardProps {
+  label: string
+  total: number
+  rate: number
+}
+
+function StatCard({ label, total, rate }: StatCardProps) {
+  return (
+    <div className="p-2 rounded-lg bg-muted/50">
+      <div className="flex items-center justify-between">
+        <div className="text-sm font-medium text-muted-foreground">{label}</div>
+        <div className={`text-sm font-medium ${getRateColor(rate)}`}>{formatRate(rate)}</div>
+      </div>
+      <div className="text-2xl font-bold tracking-tight mt-1">{formatNumber(total)}</div>
+    </div>
+  )
+}
+
 export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics }) {
   return (
     <div className="p-3">
@@ -37,42 +55,32 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
           )}
         </div>
 
-        {/* Main stats - now in a vertical layout */}
-        <div className="space-y-2">
-          <div className="p-2 rounded-lg bg-muted/50">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium text-muted-foreground">Messages</div>
-              <div className={`text-sm font-medium ${getRateColor(metrics.messagesPerSecond)}`}>
-                {formatRate(metrics.messagesPerSecond)}
-              </div>
-            </div>
-            <div className="text-2xl font-bold tracking-tight mt-1">{formatNumber(metrics.totalMessages)}</div>
-          </div>
-
-          <div className="p-2 rounded-lg bg-muted/50">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium text-muted-foreground">Creates</div>
-              <div className={`text-sm font-medium ${getRateColor(metrics.createPerSecond)}`}>
-                {formatRate(metrics.createPerSecond)}
-              </div>
-            </div>
-            <div className="text-2xl font-bold tracking-tight mt-1">{formatNumber(metrics.totalCreates)}</div>
-          </div>
-
-          <div className="p-2 rounded-lg bg-muted/50">
-            <div className="flex items-center justify-between">
-              <div className="text-sm font-medium text-muted-foreground">Deletes</div>
-              <div className={`text-sm font-medium ${getRateColor(metrics.deletePerSecond)}`}>
-                {formatRate(metrics.deletePerSecond)}
-              </div>
-            </div>
-            <div className="text-2xl font-bold tracking-tight mt-1">{formatNumber(metrics.totalDeletes)}</div>
-          </div>
+        {/* Main stats grid */}
+        <div className="grid grid-cols-2 gap-2">
+          <StatCard label="Total" total={metrics.totalMessages} rate={metrics.messagesPerSecond} />
+          <StatCard
+            label="Posts"
+            total={metrics.messagesByCollection['app.bsky.feed.post'] || 0}
+            rate={metrics.collectionRates['app.bsky.feed.post'] || 0}
+          />
+          <StatCard label="Creates" total={metrics.totalCreates} rate={metrics.createPerSecond} />
+          <StatCard label="Deletes" total={metrics.totalDeletes} rate={metrics.deletePerSecond} />
+          <StatCard
+            label="Likes"
+            total={metrics.messagesByCollection['app.bsky.feed.like'] || 0}
+            rate={metrics.collectionRates['app.bsky.feed.like'] || 0}
+          />
+          <StatCard
+            label="Follows"
+            total={metrics.messagesByCollection['app.bsky.graph.follow'] || 0}
+            rate={metrics.collectionRates['app.bsky.graph.follow'] || 0}
+          />
+          {/* <StatCard label="New users" total={metrics.totalNewAccounts} rate={metrics.newAccountsPerSecond} /> */}
         </div>
 
-        {/* Collections - now more compact */}
+        {/* Collections */}
         <div className="space-y-2">
-          <h2 className="font-semibold text-sm">Collections</h2>
+          <h2 className="font-semibold text-sm">By collection</h2>
           <ScrollArea className="h-[200px]">
             <div className="space-y-1">
               {Object.entries(metrics.messagesByCollection)

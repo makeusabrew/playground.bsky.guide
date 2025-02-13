@@ -13,12 +13,14 @@ export function useMetrics() {
     messagesByCollection: {} as Record<string, number>,
     totalCreates: 0,
     totalDeletes: 0,
+    totalNewAccounts: 0,
   })
 
   const [rates, setRates] = useState({
     messagesPerSecond: 0,
     createPerSecond: 0,
     deletePerSecond: 0,
+    newAccountsPerSecond: 0,
     collectionRates: {} as Record<string, number>,
     lastUpdate: Date.now(),
   })
@@ -31,6 +33,7 @@ export function useMetrics() {
     if (message.kind === 'commit') {
       const collection = message.commit.collection
       const operation = message.commit.operation
+      const isNewAccount = operation === 'create' && collection === 'app.bsky.actor.profile'
 
       setTotals((prev) => ({
         totalMessages: prev.totalMessages + 1,
@@ -40,6 +43,7 @@ export function useMetrics() {
         },
         totalCreates: prev.totalCreates + (operation === 'create' ? 1 : 0),
         totalDeletes: prev.totalDeletes + (operation === 'delete' ? 1 : 0),
+        totalNewAccounts: prev.totalNewAccounts + (isNewAccount ? 1 : 0),
       }))
     } else {
       setTotals((prev) => ({
@@ -75,6 +79,7 @@ export function useMetrics() {
             prev.messagesPerSecond > MINIMUM_RATE ||
             prev.createPerSecond > MINIMUM_RATE ||
             prev.deletePerSecond > MINIMUM_RATE ||
+            prev.newAccountsPerSecond > MINIMUM_RATE ||
             Object.values(prev.collectionRates).some((rate) => rate > MINIMUM_RATE)
 
           // If all rates are effectively zero, just return zeros
@@ -83,6 +88,7 @@ export function useMetrics() {
               messagesPerSecond: 0,
               createPerSecond: 0,
               deletePerSecond: 0,
+              newAccountsPerSecond: 0,
               collectionRates: {},
               lastUpdate: now,
             }
@@ -93,6 +99,7 @@ export function useMetrics() {
             messagesPerSecond: Math.max(MINIMUM_RATE, prev.messagesPerSecond * DECAY_FACTOR),
             createPerSecond: Math.max(MINIMUM_RATE, prev.createPerSecond * DECAY_FACTOR),
             deletePerSecond: Math.max(MINIMUM_RATE, prev.deletePerSecond * DECAY_FACTOR),
+            newAccountsPerSecond: Math.max(MINIMUM_RATE, prev.newAccountsPerSecond * DECAY_FACTOR),
             collectionRates: Object.fromEntries(
               Object.entries(prev.collectionRates)
                 .map(([k, v]) => [k, Math.max(MINIMUM_RATE, v * DECAY_FACTOR)])
@@ -108,8 +115,13 @@ export function useMetrics() {
         // Calculate operation rates
         const recentCreates = recentMessagesRef.current.filter((m) => m.operation === 'create').length
         const recentDeletes = recentMessagesRef.current.filter((m) => m.operation === 'delete').length
+        const recentNewAccounts = recentMessagesRef.current.filter(
+          (m) => m.operation === 'create' && m.collection === 'app.bsky.actor.profile'
+        ).length
+
         const createPerSecond = recentCreates / windowSeconds
         const deletePerSecond = recentDeletes / windowSeconds
+        const newAccountsPerSecond = recentNewAccounts / windowSeconds
 
         // Calculate collection rates
         const collections = new Set(recentMessagesRef.current.map((m) => m.collection).filter(Boolean))
@@ -125,6 +137,7 @@ export function useMetrics() {
           messagesPerSecond,
           createPerSecond,
           deletePerSecond,
+          newAccountsPerSecond,
           collectionRates,
           lastUpdate: now,
         }
