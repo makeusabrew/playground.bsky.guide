@@ -1,5 +1,4 @@
 type WebSocketClientOptions = {
-  url: string
   onMessage: (data: string) => void
   onError: (error: Error) => void
   onClose: () => void
@@ -22,12 +21,12 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
     reconnectAttempts: 0,
   }
 
-  const connect = (cursor?: number) => {
+  const connect = (url: string) => {
     if (ws?.readyState === WebSocket.OPEN) return
 
-    // FIXME: this is a bodge; cursor should be baked into the original URL
-    const separator = options.url.includes('?') ? '&' : '?'
-    ws = new WebSocket(`${options.url}${separator}${cursor ? `cursor=${cursor}` : ''}`)
+    console.log(`Connecting WebSocket to ${url}`)
+
+    ws = new WebSocket(url)
 
     ws.onopen = () => {
       state = {
@@ -42,28 +41,17 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
     }
 
     ws.onerror = (error: Event) => {
-      console.warn(`WebSocket error: ${error}`)
+      console.warn(`WebSocket error: ${error.toString()}`)
       options.onError(new Error('WebSocket error'))
     }
 
     ws.onclose = () => {
+      console.log(`WebSocket onclose() event fired`)
       state = {
         ...state,
         isConnected: false,
       }
       options.onClose()
-
-      if (
-        options.autoReconnect &&
-        (!options.maxReconnectAttempts || state.reconnectAttempts < options.maxReconnectAttempts) &&
-        (options.shouldReconnect?.() ?? true)
-      ) {
-        state = {
-          ...state,
-          reconnectAttempts: state.reconnectAttempts + 1,
-        }
-        setTimeout(connect, options.reconnectDelay || 1000)
-      }
     }
   }
 

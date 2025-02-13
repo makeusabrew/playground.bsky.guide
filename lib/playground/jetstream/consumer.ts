@@ -28,23 +28,24 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
   const buildConnectionUrl = () => {
     const params = new URLSearchParams()
 
+    // prioritise state cursor, but we might want a param to change this
+    const cursor = state.cursor || options.cursor
+
     if (options.collections?.length) {
       options.collections.forEach((c) => params.append('wantedCollections', c))
     }
     if (options.dids?.length) {
       options.dids.forEach((d) => params.append('wantedDids', d))
     }
-    // if (options.cursor || state.cursor) {
-    //   params.append('cursor', String(options.cursor || state.cursor))
-    // }
+    if (cursor) {
+      params.append('cursor', String(cursor))
+    }
     if (options.compression) {
       params.append('compress', 'true')
     }
 
     const queryString = params.toString()
-    const url = `wss://${options.instance}/subscribe${queryString ? '?' + queryString : ''}`
-    console.log(`buildConnectionUrl`, url)
-    return url
+    return `wss://${options.instance}/subscribe${queryString ? '?' + queryString : ''}`
   }
 
   const updateState = (newState: Partial<ConsumerState>) => {
@@ -53,7 +54,6 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
   }
 
   const wsClient = createWebSocketClient({
-    url: buildConnectionUrl(),
     autoReconnect: true,
     onMessage: (data) => {
       try {
@@ -65,10 +65,16 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
         options.onError?.(new Error('Failed to parse Jetstream event'))
       }
     },
-    onOpen: () => updateState({ status: 'connected', intentionalDisconnect: false }),
+    onOpen: () => updateState({ status: 'connected' }),
     onClose: () => {
       if (!state.intentionalDisconnect) {
         updateState({ status: 'disconnected' })
+
+        console.log(`Consumer was not expecting disconnect - scheduling reconnect in 3s`)
+        setTimeout(() => {
+          console.log(`Attempting reconnection`)
+          start()
+        }, 2500)
       }
     },
     onError: (error) => {
@@ -82,7 +88,7 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
 
   const start = () => {
     updateState({ status: 'connecting', intentionalDisconnect: false })
-    wsClient.connect(options.cursor)
+    wsClient.connect(buildConnectionUrl())
   }
 
   const pause = () => {
@@ -92,7 +98,7 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
 
   const resume = () => {
     updateState({ status: 'connecting', intentionalDisconnect: false })
-    wsClient.connect(state.cursor || options.cursor)
+    wsClient.connect(buildConnectionUrl())
   }
 
   const updateOptions = (newOptions: Partial<ConsumerOptions>) => {
