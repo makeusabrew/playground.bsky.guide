@@ -72,8 +72,8 @@
     box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.1);
   }
   50% {
-    box-shadow: 0 0 24px 8px rgba(234, 179, 8, 0.2),
-                inset 0 0 8px 0 rgba(234, 179, 8, 0.1);
+    box-shadow: 0 0 24px 8px rgba(8, 129, 234, 0.3),
+                inset 0 0 8px 0 rgba(21, 131, 216, 0.1);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.1);
@@ -81,6 +81,6 @@
 }
 
 .animate-shimmer {
-  animation: shimmer 2s ease-in-out infinite;
+  animation: shimmer 1.5s ease-in-out infinite;
   transition: box-shadow 0.3s ease-in-out;
 }
