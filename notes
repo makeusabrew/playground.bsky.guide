@@ -5,3 +5,4 @@
 * FEAT: automatic hydration sometimes?
 * FEAT: show HTTP requests when they are added
 * IDEA: 'stats' should show different headlines: messages, posts, likes
+* IDEA: can we use these types? https://docs.bsky.app/blog/api-v0-14-0-release-notes

@@ -21,7 +21,7 @@ export default function ConnectionConfig({ options, setOptions }: ConnectionConf
           <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
             <div className="flex items-center gap-2">
               <Settings size={16} className="text-muted-foreground" />
-              <h2 className="font-semibold">Connection settings</h2>
+              <h2 className="font-semibold">Jetstream connection settings</h2>
             </div>
           </div>
 

@@ -54,6 +54,39 @@ export default function Home() {
                   connectionState={connectionState}
                   setConnectionState={setConnectionState}
                 />
+                <div>
+                  <div className="border-t p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-muted-foreground">
+                        <a
+                          href="https://github.com/bluesky-social/jetstream"
+                          className="underline hover:text-foreground"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Jetstream
+                        </a>{' '}
+                        is a Bluesky-operated WebSocket service that streams the Bluesky firehose as friendly JSON
+                        messages.
+                      </p>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      This playground is a community-maintained (by{' '}
+                      <a
+                        href="https://bsky.app/profile/makeusabrew.bsky.social"
+                        className="underline hover:text-foreground"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        me
+                      </a>
+                      ) tool which lets you connect to and explore the Jetstream service directly from your browser.
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      It&rsquo;s brand new, and I&rsquo;d love your feedback.
+                    </div>
+                  </div>
+                </div>
               </Card>
             </div>
             <div className="md:col-span-6">
