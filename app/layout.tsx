@@ -27,7 +27,7 @@ export default function RootLayout({
               <div className="flex flex-1 items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <Link
-                    href="/"
+                    href="https://bsky.guide"
                     className="flex items-center space-x-2 text-sm font-medium transition-colors hover:text-blue-500/90"
                   >
                     <span className="text-blue-500 font-semibold drop-shadow-[0_0_0.3rem_#0000ff70]">bsky.guide</span>
