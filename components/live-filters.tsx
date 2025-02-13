@@ -79,36 +79,34 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
 
         <div className="space-y-4">
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Event kinds</h3>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="identity"
-                  checked={filters.showIdentity}
-                  onCheckedChange={(checked) => updateFilter('showIdentity', checked)}
-                />
-                <label htmlFor="identity" className="text-sm flex items-center gap-1.5">
-                  <UserRound size={14} />
-                  Identity events
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="account"
-                  checked={filters.showAccount}
-                  onCheckedChange={(checked) => updateFilter('showAccount', checked)}
-                />
-                <label htmlFor="account" className="text-sm flex items-center gap-1.5">
-                  <ShieldCheck size={14} />
-                  Account events
-                </label>
-              </div>
+            <h3 className="text-sm font-medium">Collections</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {Object.entries(COMMON_COLLECTIONS).map(([collection, name]) => (
+                <div key={collection} className="flex items-center space-x-2">
+                  <Switch
+                    id={collection}
+                    checked={filters.selectedCollections.includes(collection)}
+                    onCheckedChange={(checked) => {
+                      updateFilter(
+                        'selectedCollections',
+                        checked
+                          ? [...filters.selectedCollections, collection]
+                          : filters.selectedCollections.filter((c) => c !== collection)
+                      )
+                    }}
+                  />
+                  <label htmlFor={collection} className="text-sm flex items-center gap-1.5 min-w-0 truncate">
+                    {COLLECTION_ICONS[collection]}
+                    {name}
+                  </label>
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="space-y-3">
             <h3 className="text-sm font-medium">Commit operations</h3>
-            <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <div className="flex items-center space-x-2">
                 <Switch
                   id="creates"
@@ -144,30 +142,31 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
               </div>
             </div>
           </div>
-
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Collections</h3>
+            <h3 className="text-sm font-medium">Extra events</h3>
             <div className="grid grid-cols-2 gap-2">
-              {Object.entries(COMMON_COLLECTIONS).map(([collection, name]) => (
-                <div key={collection} className="flex items-center space-x-2">
-                  <Switch
-                    id={collection}
-                    checked={filters.selectedCollections.includes(collection)}
-                    onCheckedChange={(checked) => {
-                      updateFilter(
-                        'selectedCollections',
-                        checked
-                          ? [...filters.selectedCollections, collection]
-                          : filters.selectedCollections.filter((c) => c !== collection)
-                      )
-                    }}
-                  />
-                  <label htmlFor={collection} className="text-sm flex items-center gap-1.5 min-w-0 truncate">
-                    {COLLECTION_ICONS[collection]}
-                    {name}
-                  </label>
-                </div>
-              ))}
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="identity"
+                  checked={filters.showIdentity}
+                  onCheckedChange={(checked) => updateFilter('showIdentity', checked)}
+                />
+                <label htmlFor="identity" className="text-sm flex items-center gap-1.5">
+                  <UserRound size={14} />
+                  Identity
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="account"
+                  checked={filters.showAccount}
+                  onCheckedChange={(checked) => updateFilter('showAccount', checked)}
+                />
+                <label htmlFor="account" className="text-sm flex items-center gap-1.5">
+                  <ShieldCheck size={14} />
+                  Account
+                </label>
+              </div>
             </div>
           </div>
 
