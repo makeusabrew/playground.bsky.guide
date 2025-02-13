@@ -147,7 +147,7 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
 
           <div className="space-y-3">
             <h3 className="text-sm font-medium">Collections</h3>
-            <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {Object.entries(COMMON_COLLECTIONS).map(([collection, name]) => (
                 <div key={collection} className="flex items-center space-x-2">
                   <Switch
@@ -162,7 +162,7 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
                       )
                     }}
                   />
-                  <label htmlFor={collection} className="text-sm flex items-center gap-1.5">
+                  <label htmlFor={collection} className="text-sm flex items-center gap-1.5 min-w-0 truncate">
                     {COLLECTION_ICONS[collection]}
                     {name}
                   </label>
