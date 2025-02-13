@@ -1,8 +1,6 @@
 'use client'
 
 import { Switch } from './ui/switch'
-import { Input } from './ui/input'
-import { Button } from './ui/button'
 import {
   Plus,
   Pencil,
@@ -15,7 +13,6 @@ import {
   Users,
   Ban,
   User,
-  X,
   Filter,
 } from 'lucide-react'
 
@@ -82,8 +79,36 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
 
         <div className="space-y-4">
           <div className="space-y-3">
-            <h3 className="text-sm font-medium">Event types</h3>
-            <div className=" flex flex-col gap-2">
+            <h3 className="text-sm font-medium">Event kinds</h3>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="identity"
+                  checked={filters.showIdentity}
+                  onCheckedChange={(checked) => updateFilter('showIdentity', checked)}
+                />
+                <label htmlFor="identity" className="text-sm flex items-center gap-1.5">
+                  <UserRound size={14} />
+                  Identity events
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="account"
+                  checked={filters.showAccount}
+                  onCheckedChange={(checked) => updateFilter('showAccount', checked)}
+                />
+                <label htmlFor="account" className="text-sm flex items-center gap-1.5">
+                  <ShieldCheck size={14} />
+                  Account events
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium">Commit operations</h3>
+            <div className="flex flex-col gap-2">
               <div className="flex items-center space-x-2">
                 <Switch
                   id="creates"
@@ -117,28 +142,6 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
                   Deletes
                 </label>
               </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="identity"
-                  checked={filters.showIdentity}
-                  onCheckedChange={(checked) => updateFilter('showIdentity', checked)}
-                />
-                <label htmlFor="identity" className="text-sm flex items-center gap-1.5">
-                  <UserRound size={14} />
-                  Identity
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="account"
-                  checked={filters.showAccount}
-                  onCheckedChange={(checked) => updateFilter('showAccount', checked)}
-                />
-                <label htmlFor="account" className="text-sm flex items-center gap-1.5">
-                  <ShieldCheck size={14} />
-                  Account
-                </label>
-              </div>
             </div>
           </div>
 
@@ -168,7 +171,7 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
             </div>
           </div>
 
-          <div className="space-y-3">
+          {/* <div className="space-y-3">
             <h3 className="text-sm font-medium">DID filter</h3>
             <div className="flex space-x-2">
               <Input
@@ -182,7 +185,7 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
                 </Button>
               )}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

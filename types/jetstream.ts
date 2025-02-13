@@ -1,3 +1,6 @@
+/**
+ * Move this
+ */
 export interface JetstreamConfig {
   instance: string
   collections: string

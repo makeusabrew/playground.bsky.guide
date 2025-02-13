@@ -1,4 +1,4 @@
-* BUG: resume no longer works - skips to the end, or sometimes at least?
+* BUG: resume no longer works - skips to the end, or sometimes at least? Does WS crash and resume from head?
 * FIX: filters need sorting
 * FIX: filters should apply to stats
 * FEAT: allow a 'raw' post to be 'resolved' - fetch dids, URIs, etc, rendered in a dialog?
