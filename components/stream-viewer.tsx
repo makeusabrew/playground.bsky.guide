@@ -15,8 +15,12 @@ import {
   Ban,
   User,
   ScrollText,
+  Eye,
+  EyeOff,
 } from 'lucide-react'
 import { Card } from './ui/card'
+import { Button } from './ui/button'
+
 interface StreamViewerProps {
   messages: JetstreamEvent[]
   filteredMessages: JetstreamEvent[]
@@ -56,24 +60,70 @@ const getCollectionIcon = (collection: string) => {
   }
 }
 
+const getEventColor = (event: JetstreamEvent) => {
+  if (event.kind === 'identity') return 'bg-purple-500/10'
+  if (event.kind === 'account') return 'bg-blue-500/10'
+  if (event.kind === 'commit') {
+    switch (event.commit.operation) {
+      case 'create':
+        return 'bg-green-500/10'
+      case 'update':
+        return 'bg-yellow-500/10'
+      case 'delete':
+        return 'bg-red-500/10'
+      default:
+        return 'bg-gray-500/10'
+    }
+  }
+  return 'bg-gray-500/10'
+}
+
+const getEventBadgeColor = (event: JetstreamEvent): BadgeVariant => {
+  if (event.kind === 'identity') return 'secondary'
+  if (event.kind === 'account') return 'secondary'
+  if (event.kind === 'commit') {
+    switch (event.commit.operation) {
+      case 'create':
+        return 'default'
+      case 'update':
+        return 'secondary'
+      case 'delete':
+        return 'destructive'
+      default:
+        return 'outline'
+    }
+  }
+  return 'outline'
+}
+
 export default function StreamViewer({ messages, filteredMessages }: StreamViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [autoScroll, setAutoScroll] = useState(true)
-  const userScrollRef = useRef(false)
   const [lag, setLag] = useState<number | null>(null)
   const latestMessageTimeRef = useRef<number | null>(null)
+  const [isViewFrozen, setIsViewFrozen] = useState(false)
+  const frozenMessagesRef = useRef<JetstreamEvent[]>([])
 
   // only render last 100 for our protection!
-  const displayMessages = filteredMessages.slice(-100)
+  const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages.slice(-100)
 
   // Keep latest message time updated
   useEffect(() => {
-    if (displayMessages.length > 0) {
-      latestMessageTimeRef.current = Math.floor(displayMessages[displayMessages.length - 1].time_us / 1000)
+    // Always update the latest message time from filtered messages, even when view is frozen
+    if (filteredMessages.length > 0) {
+      latestMessageTimeRef.current = Math.floor(filteredMessages[filteredMessages.length - 1].time_us / 1000)
     } else {
       latestMessageTimeRef.current = null
     }
-  }, [displayMessages])
+  }, [filteredMessages])
+
+  // Store messages when freezing view
+  const handleFreezeToggle = () => {
+    if (!isViewFrozen) {
+      // When freezing, store current messages
+      frozenMessagesRef.current = filteredMessages.slice(-100)
+    }
+    setIsViewFrozen(!isViewFrozen)
+  }
 
   // Update lag every second
   useEffect(() => {
@@ -94,73 +144,11 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
     return () => clearInterval(interval)
   }, []) // No dependencies needed - we use the ref
 
-  // Handle auto-scrolling
+  // Handle auto-scrolling - always scroll to bottom when live, allow manual scroll when frozen
   useEffect(() => {
-    if (!autoScroll || !scrollRef.current) return
+    if (isViewFrozen || !scrollRef.current) return
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-  }, [displayMessages, autoScroll])
-
-  // Only disable auto-scroll on user interaction
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    // Ignore programmatic scroll events
-    if (!userScrollRef.current) return
-
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
-    const isNearBottom = scrollHeight - scrollTop - clientHeight < 50
-    setAutoScroll(isNearBottom)
-  }
-
-  // Track when scroll events are from user interaction
-  const handleWheel = () => {
-    userScrollRef.current = true
-  }
-
-  const handleTouchStart = () => {
-    userScrollRef.current = true
-  }
-
-  // Reset user interaction flag after a short delay
-  const handleInteractionEnd = () => {
-    setTimeout(() => {
-      userScrollRef.current = false
-    }, 100)
-  }
-
-  const getEventColor = (event: JetstreamEvent) => {
-    if (event.kind === 'identity') return 'bg-purple-500/10'
-    if (event.kind === 'account') return 'bg-blue-500/10'
-    if (event.kind === 'commit') {
-      switch (event.commit.operation) {
-        case 'create':
-          return 'bg-green-500/10'
-        case 'update':
-          return 'bg-yellow-500/10'
-        case 'delete':
-          return 'bg-red-500/10'
-        default:
-          return 'bg-gray-500/10'
-      }
-    }
-    return 'bg-gray-500/10'
-  }
-
-  const getEventBadgeColor = (event: JetstreamEvent): BadgeVariant => {
-    if (event.kind === 'identity') return 'secondary'
-    if (event.kind === 'account') return 'secondary'
-    if (event.kind === 'commit') {
-      switch (event.commit.operation) {
-        case 'create':
-          return 'default'
-        case 'update':
-          return 'secondary'
-        case 'delete':
-          return 'destructive'
-        default:
-          return 'outline'
-      }
-    }
-    return 'outline'
-  }
+  }, [displayMessages, isViewFrozen])
 
   const getLagStyles = (lagMs: number): string => {
     if (lagMs <= 1000) return 'bg-green-50'
@@ -178,22 +166,28 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
           <ScrollText size={16} className="text-muted-foreground" />
           <h2 className="font-semibold">Message stream</h2>
         </div>
-        {lag !== null && (
-          <Badge variant="outline" className={`text-xs ${getLagStyles(lag)}`}>
-            Lag: {lag < 1000 ? `${lag}ms` : `${(lag / 1000).toFixed(1)}s`}
-          </Badge>
-        )}
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={
+              isViewFrozen ? 'text-blue-600 hover:text-blue-700' : 'text-muted-foreground hover:text-foreground'
+            }
+            onClick={handleFreezeToggle}
+            title={isViewFrozen ? 'Unfreeze view' : 'Freeze view'}
+          >
+            {isViewFrozen ? <EyeOff size={16} /> : <Eye size={16} />}
+            <span className="ml-1.5 text-xs">{isViewFrozen ? 'Frozen' : 'Live'}</span>
+          </Button>
+          {lag !== null && (
+            <Badge variant="outline" className={`text-xs ${getLagStyles(lag)}`}>
+              Lag: {lag < 1000 ? `${lag}ms` : `${(lag / 1000).toFixed(1)}s`}
+            </Badge>
+          )}
+        </div>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto p-3"
-        onScroll={handleScroll}
-        onWheel={handleWheel}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleInteractionEnd}
-        onWheelCapture={handleInteractionEnd}
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto p-3">
         {displayMessages.length === 0 ? (
           <div className="text-xs text-muted-foreground">
             {messages.length === 0 ? 'Waiting for connection...' : 'No messages match the current filters'}

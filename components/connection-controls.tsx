@@ -1,7 +1,7 @@
 'use client'
+import { ConnectionState } from '@/app/hooks/use-connection'
 import { Button } from '@/components/ui/button'
 import { PauseCircle, PlayCircle, RotateCcw } from 'lucide-react'
-import { ConnectionState } from '@/app/page'
 
 interface ConnectionControlsProps {
   hasEverConnected: boolean
