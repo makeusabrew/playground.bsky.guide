@@ -3,23 +3,10 @@ type WebSocketClientOptions = {
   onError: (error: Error) => void
   onClose: () => void
   onOpen: () => void
-  autoReconnect?: boolean
-  maxReconnectAttempts?: number
-  reconnectDelay?: number
-  shouldReconnect?: () => boolean
-}
-
-type WebSocketClientState = {
-  isConnected: boolean
-  reconnectAttempts: number
 }
 
 export const createWebSocketClient = (options: WebSocketClientOptions) => {
   let ws: WebSocket | null = null
-  let state: WebSocketClientState = {
-    isConnected: false,
-    reconnectAttempts: 0,
-  }
 
   const connect = (url: string) => {
     if (ws?.readyState === WebSocket.OPEN) return
@@ -29,10 +16,6 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
     ws = new WebSocket(url)
 
     ws.onopen = () => {
-      state = {
-        isConnected: true,
-        reconnectAttempts: 0,
-      }
       options.onOpen()
     }
 
@@ -47,10 +30,6 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
 
     ws.onclose = () => {
       console.log(`WebSocket onclose() event fired`)
-      state = {
-        ...state,
-        isConnected: false,
-      }
       options.onClose()
     }
   }

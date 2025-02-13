@@ -54,7 +54,6 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
   }
 
   const wsClient = createWebSocketClient({
-    autoReconnect: true,
     onMessage: (data) => {
       try {
         const event = JSON.parse(data) as JetstreamEvent
@@ -83,7 +82,6 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
         options.onError?.(error)
       }
     },
-    shouldReconnect: () => !state.intentionalDisconnect,
   })
 
   const start = () => {
