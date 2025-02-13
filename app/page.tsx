@@ -81,8 +81,6 @@ export default function Home() {
                         me
                       </a>
                       ) tool which lets you connect to and explore the Jetstream service directly from your browser.
-                    </div>
-                    <div className="text-sm text-muted-foreground">
                       It&rsquo;s brand new, and I&rsquo;d love your feedback.
                     </div>
                   </div>
