@@ -33,16 +33,8 @@ export default function RootLayout({
                     <span className="text-blue-500 font-semibold drop-shadow-[0_0_0.3rem_#0000ff70]">bsky.guide</span>
                   </Link>
                   <span className="text-muted-foreground/60">/</span>
-                  <span className="font-medium">Bluesky Jetstream Playground</span>
+                  <span className="font-medium tracking-tight">Bluesky Jetstream Playground</span>
                 </div>
-                <a
-                  href="https://bsky.app/profile/makeusabrew.bsky.social"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  @makeusabrew
-                </a>
               </div>
             </div>
           </header>
