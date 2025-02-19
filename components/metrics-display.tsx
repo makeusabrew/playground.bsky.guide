@@ -6,7 +6,18 @@ import { Activity } from 'lucide-react'
 
 function formatNumber(num: number): string {
   if (num === 0) return '0'
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}k`
+  if (num >= 1_000_000_000) {
+    const billions = num / 1_000_000_000
+    return `${billions >= 100 ? billions.toFixed(1) : billions.toFixed(4)}b`
+  }
+  if (num >= 1_000_000) {
+    const millions = num / 1_000_000
+    return `${millions >= 100 ? millions.toFixed(1) : millions.toFixed(4)}m`
+  }
+  if (num >= 1000) {
+    const thousands = num / 1000
+    return `${thousands >= 100 ? thousands.toFixed(1) : thousands.toFixed(2)}k`
+  }
   return num.toFixed(0)
 }
 
