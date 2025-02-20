@@ -26,11 +26,11 @@ function formatNumber(num: number): string {
   if (num === 0) return '0'
   if (num >= 1_000_000_000) {
     const billions = num / 1_000_000_000
-    return `${billions >= 100 ? billions.toFixed(1) : billions.toFixed(4)}b`
+    return `${billions >= 100 ? billions.toFixed(1) : billions.toFixed(3)}b`
   }
   if (num >= 1_000_000) {
     const millions = num / 1_000_000
-    return `${millions >= 100 ? millions.toFixed(1) : millions.toFixed(4)}m`
+    return `${millions >= 100 ? millions.toFixed(1) : millions.toFixed(3)}m`
   }
   if (num >= 1000) {
     const thousands = num / 1000
