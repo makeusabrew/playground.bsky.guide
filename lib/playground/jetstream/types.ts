@@ -1,82 +1,16 @@
+import {
+  AppBskyFeedPost,
+  AppBskyFeedLike,
+  AppBskyFeedRepost,
+  AppBskyGraphBlock,
+  AppBskyGraphFollow,
+  AppBskyActorProfile,
+} from '@atproto/api'
+
 interface BaseEvent {
   did: string
   time_us: number
   kind: 'commit' | 'identity' | 'account'
-}
-
-export type BlobRef = {
-  $type: 'blob'
-  ref: {
-    $link: string
-  }
-  mimeType: string
-  size: number
-}
-
-export type AspectRatio = {
-  width: number
-  height: number
-}
-
-export type ImageEmbed = {
-  $type: 'app.bsky.embed.images'
-  images: {
-    alt: string
-    image: BlobRef
-    aspectRatio?: AspectRatio
-  }[]
-}
-
-export type ExternalEmbed = {
-  $type: 'app.bsky.embed.external'
-  external: {
-    uri: string
-    title: string
-    description: string
-    thumb?: BlobRef
-  }
-}
-
-export type RecordEmbed = {
-  $type: 'app.bsky.embed.record'
-  record: {
-    uri: string
-    cid: string
-  }
-}
-
-export type RecordWithMediaEmbed = {
-  $type: 'app.bsky.embed.recordWithMedia'
-  record: {
-    record: {
-      uri: string
-      cid: string
-    }
-  }
-  media: ImageEmbed
-}
-
-export type Reply = {
-  root: {
-    cid: string
-    uri: string
-  }
-  parent: {
-    cid: string
-    uri: string
-  }
-}
-
-export type Embed = ImageEmbed | ExternalEmbed | RecordEmbed | RecordWithMediaEmbed
-
-export type Post = {
-  $type: 'app.bsky.feed.post'
-  text: string
-  createdAt: string
-  reply?: Reply
-  // is this actually an array?
-  embed?: Embed
-  langs?: string[]
 }
 
 export type Like = {
@@ -94,7 +28,13 @@ export interface CommitEvent extends BaseEvent {
     operation: 'create' | 'update' | 'delete'
     collection: string
     rkey: string
-    record?: Post | Like
+    record?:
+      | AppBskyFeedPost.Record
+      | AppBskyFeedLike.Record
+      | AppBskyFeedRepost.Record
+      | AppBskyGraphBlock.Record
+      | AppBskyGraphFollow.Record
+      | AppBskyActorProfile.Record
     cid?: string
   }
 }
@@ -120,27 +60,3 @@ export interface AccountEvent extends BaseEvent {
 }
 
 export type JetstreamEvent = CommitEvent | IdentityEvent | AccountEvent
-
-export type JetstreamMetrics = {
-  // Totals
-  totalMessages: number
-  messagesByCollection: Record<string, number>
-  totalCreates: number
-  totalDeletes: number
-  totalNewAccounts: number
-
-  // Rates (per second)
-  messagesPerSecond: number
-  createPerSecond: number
-  deletePerSecond: number
-  newAccountsPerSecond: number
-  collectionRates: Record<string, number>
-
-  // For rate calculations
-  lastUpdate: number
-}
-
-export type MetricsUpdate = {
-  type: 'metrics'
-  metrics: JetstreamMetrics
-}

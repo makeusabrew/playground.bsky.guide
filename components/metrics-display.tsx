@@ -1,8 +1,26 @@
 'use client'
-import { JetstreamMetrics } from '@/lib/playground/jetstream/types'
 import { Badge } from './ui/badge'
 import { ScrollArea } from './ui/scroll-area'
 import { Activity } from 'lucide-react'
+
+type JetstreamMetrics = {
+  // Totals
+  totalMessages: number
+  messagesByCollection: Record<string, number>
+  totalCreates: number
+  totalDeletes: number
+  totalNewAccounts: number
+
+  // Rates (per second)
+  messagesPerSecond: number
+  createPerSecond: number
+  deletePerSecond: number
+  newAccountsPerSecond: number
+  collectionRates: Record<string, number>
+
+  // For rate calculations
+  lastUpdate: number
+}
 
 function formatNumber(num: number): string {
   if (num === 0) return '0'
