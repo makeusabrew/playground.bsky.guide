@@ -7,21 +7,9 @@ import {
   AppBskyActorProfile,
 } from '@atproto/api'
 
-interface BaseEvent {
+export interface CommitEvent {
   did: string
   time_us: number
-  kind: 'commit' | 'identity' | 'account'
-}
-
-export type Like = {
-  $type: 'app.bsky.feed.like'
-  subject: {
-    cid: string
-    uri: string
-  }
-}
-
-export interface CommitEvent extends BaseEvent {
   kind: 'commit'
   commit: {
     rev: string
@@ -39,7 +27,9 @@ export interface CommitEvent extends BaseEvent {
   }
 }
 
-export interface IdentityEvent extends BaseEvent {
+export interface IdentityEvent {
+  did: string
+  time_us: number
   kind: 'identity'
   identity: {
     did: string
@@ -49,7 +39,9 @@ export interface IdentityEvent extends BaseEvent {
   }
 }
 
-export interface AccountEvent extends BaseEvent {
+export interface AccountEvent {
+  did: string
+  time_us: number
   kind: 'account'
   account: {
     active: boolean
