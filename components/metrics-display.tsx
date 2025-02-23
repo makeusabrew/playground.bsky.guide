@@ -74,7 +74,7 @@ export default function MetricsDisplay({ metrics }: { metrics: JetstreamMetrics 
       <div className="space-y-4">
         <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
           <div className="flex items-center gap-2">
-            <Activity size={16} className="text-muted-foreground" />
+            <Activity size={16} className="text-muted-foreground hidden md:block" />
             <h2 className="font-semibold">Stats</h2>
           </div>
           {metrics.totalMessages > 0 && (

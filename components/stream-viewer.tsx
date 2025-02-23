@@ -163,10 +163,10 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
     <Card className="h-[calc(100vh-100px)] flex flex-col">
       <div className="p-3 border-b flex-none flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ScrollText size={16} className="text-muted-foreground" />
+          <ScrollText size={16} className="text-muted-foreground hidden md:block" />
           <h2 className="font-semibold">Message stream</h2>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
             variant="ghost"
             size="sm"
@@ -177,11 +177,11 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
             title={isViewFrozen ? 'Unfreeze view' : 'Freeze view'}
           >
             {isViewFrozen ? <EyeOff size={16} /> : <Eye size={16} />}
-            <span className="ml-1.5 text-xs">{isViewFrozen ? 'Frozen' : 'Live'}</span>
+            <span className="text-xs">{isViewFrozen ? 'Frozen' : 'Live'}</span>
           </Button>
           {lag !== null && (
             <Badge variant="outline" className={`text-xs ${getLagStyles(lag)}`}>
-              Lag: {lag < 1000 ? `${lag}ms` : `${(lag / 1000).toFixed(1)}s`}
+              Lag: {lag < 1000 ? `${Math.max(lag, 0)}ms` : `${(lag / 1000).toFixed(1)}s`}
             </Badge>
           )}
         </div>

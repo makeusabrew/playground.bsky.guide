@@ -34,8 +34,8 @@ export default function ConnectionConfig({
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
             <div className="flex items-center gap-2">
-              <Settings size={16} className="text-muted-foreground" />
-              <h2 className="font-semibold">Jetstream connection</h2>
+              <Settings size={16} className="text-muted-foreground hidden md:block" />
+              <h2 className="font-semibold">Jetstream connection settings</h2>
             </div>
           </div>
 

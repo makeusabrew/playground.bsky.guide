@@ -71,7 +71,7 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
       <div className="space-y-6">
         <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
           <h2 className="font-semibold flex items-center gap-2">
-            <Filter size={16} className="text-muted-foreground" />
+            <Filter size={16} className="text-muted-foreground hidden md:block" />
             Live filters
           </h2>
           {/* <p className="text-sm text-muted-foreground">Filter the stream in real-time</p> */}
