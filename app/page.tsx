@@ -81,9 +81,7 @@ export default function Home() {
                         </div>
                       </div>
                       <CollapsibleContent>
-                        <div className="px-3 pb-3">
-                          <ConnectionString options={connectionOptions} />
-                        </div>
+                        <ConnectionString options={connectionOptions} />
                       </CollapsibleContent>
                     </Collapsible>
                   </TooltipProvider>
