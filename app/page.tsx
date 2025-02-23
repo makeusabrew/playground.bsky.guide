@@ -7,16 +7,20 @@ import { Card } from '@/components/ui/card'
 import LiveFilters from '@/components/live-filters'
 import ConnectionControls from '@/components/connection-controls'
 import { useMetrics } from './hooks/use-metrics'
-import { useShimmer } from './hooks/use-shimmer'
+/* import { useShimmer } from './hooks/use-shimmer' */
 import { useConnection } from './hooks/use-connection'
 import { useFilters } from './hooks/use-filters'
 import { useJetstream } from './hooks/use-jetstream'
 import { useEffect, useState } from 'react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { ChevronDown, ChevronUp, Info } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 export default function Home() {
-  const showShimmer = useShimmer()
+  // const showShimmer = useShimmer()
   const { metrics, onMessage } = useMetrics()
   const [hasEverConnected, setHasEverConnected] = useState(false)
+  const [isConnectionStringOpen, setIsConnectionStringOpen] = useState(false)
   const { connectionState, setConnectionState, connectionOptions, setConnectionOptions } = useConnection()
   const jetstream = useJetstream({ ...connectionOptions, onMessage })
   const messages = jetstream.messages
@@ -42,13 +46,48 @@ export default function Home() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
             <div className="md:col-span-3 space-y-3">
-              <Card className={`${showShimmer ? 'animate-shimmer' : ''}`}>
+              <Card>
                 <ConnectionConfig
                   connectionState={connectionState}
                   options={connectionOptions}
                   setOptions={setConnectionOptions}
                 />
-                <ConnectionString options={connectionOptions} />
+                <div className="border-t">
+                  <TooltipProvider>
+                    <Collapsible open={isConnectionStringOpen} onOpenChange={setIsConnectionStringOpen}>
+                      <div className="flex items-center justify-between p-3">
+                        <div className="flex items-center gap-1.5">
+                          <CollapsibleTrigger className="flex items-center gap-2 text-sm text-foreground font-medium hover:text-foreground transition-colors">
+                            {isConnectionStringOpen ? (
+                              <>
+                                Hide connection string
+                                <ChevronUp size={16} />
+                              </>
+                            ) : (
+                              <>
+                                Show connection string
+                                <ChevronDown size={16} />
+                              </>
+                            )}
+                          </CollapsibleTrigger>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info size={14} className="text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent side="right">
+                              <p>View the full WebSocket URL with your current configuration</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </div>
+                      </div>
+                      <CollapsibleContent>
+                        <div className="px-3 pb-3">
+                          <ConnectionString options={connectionOptions} />
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </TooltipProvider>
+                </div>
                 <ConnectionControls
                   hasEverConnected={hasEverConnected}
                   connectionState={connectionState}
@@ -57,7 +96,7 @@ export default function Home() {
                 <div>
                   <div className="border-t p-3 space-y-2">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         <a
                           href="https://github.com/bluesky-social/jetstream"
                           className="underline hover:text-foreground"
@@ -70,7 +109,7 @@ export default function Home() {
                         messages.
                       </p>
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs sm:text-sm text-muted-foreground">
                       This playground is a community-maintained (by{' '}
                       <a
                         href="https://bsky.app/profile/makeusabrew.bsky.social"
