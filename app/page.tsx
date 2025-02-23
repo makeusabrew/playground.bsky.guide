@@ -89,7 +89,7 @@ export default function Home() {
                     </Collapsible>
                   </TooltipProvider>
                 </div>
-                <div>
+                <div className="hidden md:block">
                   <div className="border-t p-3 space-y-2">
                     <div className="flex items-center gap-2">
                       <p className="text-xs sm:text-sm text-muted-foreground">
