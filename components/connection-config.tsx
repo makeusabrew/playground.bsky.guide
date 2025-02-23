@@ -5,23 +5,33 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { JetstreamConfig } from '@/types/jetstream'
-import { ChevronDown, ChevronUp, Info, Settings } from 'lucide-react'
+import { ChevronDown, ChevronUp, Info, Settings, PauseCircle, PlayCircle, RotateCcw } from 'lucide-react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 
 interface ConnectionConfigProps {
   connectionState: ConnectionState
   options: JetstreamConfig
   setOptions: (options: JetstreamConfig) => void
+  hasEverConnected: boolean
+  setConnectionState: (connectionState: ConnectionState) => void
 }
 
-export default function ConnectionConfig({ options, setOptions }: ConnectionConfigProps) {
+export default function ConnectionConfig({
+  options,
+  setOptions,
+  connectionState,
+  hasEverConnected,
+  setConnectionState,
+}: ConnectionConfigProps) {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
+  const isConnected = connectionState.connected
 
   return (
     <TooltipProvider>
       <div className="p-3">
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
             <div className="flex items-center gap-2">
               <Settings size={16} className="text-muted-foreground" />
@@ -61,6 +71,49 @@ export default function ConnectionConfig({ options, setOptions }: ConnectionConf
                   <SelectItem value="jetstream2.us-west.bsky.network">US-West 2</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="flex items-center justify-between gap-2 border-b pb-3 -mx-3 px-3">
+              {isConnected ? (
+                <Button
+                  className="w-full flex items-center gap-2"
+                  onClick={() => setConnectionState({ connected: false, mode: 'restart' })}
+                >
+                  <PauseCircle className="w-4 h-4" />
+                  Pause
+                </Button>
+              ) : (
+                <>
+                  {hasEverConnected ? (
+                    <>
+                      <Button
+                        className="w-full flex items-center gap-2"
+                        onClick={() => setConnectionState({ connected: true, mode: 'resume' })}
+                      >
+                        <PlayCircle className="w-4 h-4" />
+                        Resume
+                      </Button>
+                      <Button
+                        className="flex items-center gap-2"
+                        onClick={() => setConnectionState({ connected: true, mode: 'restart' })}
+                        variant="secondary"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        Restart
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      className="w-full flex items-center gap-2"
+                      onClick={() => setConnectionState({ connected: true, mode: 'restart' })}
+                      variant="default"
+                    >
+                      <PlayCircle className="w-4 h-4" />
+                      Connect
+                    </Button>
+                  )}
+                </>
+              )}
             </div>
 
             <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen} className="space-y-4">

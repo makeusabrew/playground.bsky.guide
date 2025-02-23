@@ -5,7 +5,6 @@ import MetricsDisplay from '@/components/metrics-display'
 import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
 import LiveFilters from '@/components/live-filters'
-import ConnectionControls from '@/components/connection-controls'
 import { useMetrics } from './hooks/use-metrics'
 /* import { useShimmer } from './hooks/use-shimmer' */
 import { useConnection } from './hooks/use-connection'
@@ -51,6 +50,8 @@ export default function Home() {
                   connectionState={connectionState}
                   options={connectionOptions}
                   setOptions={setConnectionOptions}
+                  hasEverConnected={hasEverConnected}
+                  setConnectionState={setConnectionState}
                 />
                 <div className="border-t">
                   <TooltipProvider>
@@ -81,16 +82,13 @@ export default function Home() {
                         </div>
                       </div>
                       <CollapsibleContent>
-                        <ConnectionString options={connectionOptions} />
+                        <div className="px-3 pb-3">
+                          <ConnectionString options={connectionOptions} />
+                        </div>
                       </CollapsibleContent>
                     </Collapsible>
                   </TooltipProvider>
                 </div>
-                <ConnectionControls
-                  hasEverConnected={hasEverConnected}
-                  connectionState={connectionState}
-                  setConnectionState={setConnectionState}
-                />
                 <div>
                   <div className="border-t p-3 space-y-2">
                     <div className="flex items-center gap-2">

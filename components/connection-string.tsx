@@ -9,7 +9,7 @@ export function ConnectionString({ options }: { options: JetstreamConfig }) {
   return (
     <div className="p-3">
       <div className="space-y-4">
-        {/* <h2 className="font-semibold">Connection string</h2> */}
+        <h2 className="font-semibold">Connection string</h2>
 
         <Tabs defaultValue="raw" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3">
