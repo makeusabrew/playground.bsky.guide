@@ -40,8 +40,8 @@ export default function ConnectionConfig({
           </div>
 
           <div className="space-y-4">
-            <div className="space-y-2.5">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <Label className="text-sm">Instance</Label>
                 <Tooltip>
                   <TooltipTrigger asChild>
