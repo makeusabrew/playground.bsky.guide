@@ -11,15 +11,11 @@ import { useConnection } from './hooks/use-connection'
 import { useFilters } from './hooks/use-filters'
 import { useJetstream } from './hooks/use-jetstream'
 import { useEffect, useState } from 'react'
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { ChevronDown, ChevronUp, Info } from 'lucide-react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 export default function Home() {
   // const showShimmer = useShimmer()
   const { metrics, onMessage } = useMetrics()
   const [hasEverConnected, setHasEverConnected] = useState(false)
-  const [isConnectionStringOpen, setIsConnectionStringOpen] = useState(false)
   const { connectionState, setConnectionState, connectionOptions, setConnectionOptions } = useConnection()
   const jetstream = useJetstream({ ...connectionOptions, onMessage })
   const messages = jetstream.messages
@@ -54,40 +50,9 @@ export default function Home() {
                   setConnectionState={setConnectionState}
                 />
                 <div className="border-t">
-                  <TooltipProvider>
-                    <Collapsible open={isConnectionStringOpen} onOpenChange={setIsConnectionStringOpen}>
-                      <div className="flex items-center justify-between p-3">
-                        <div className="flex items-center gap-1.5">
-                          <CollapsibleTrigger className="flex items-center gap-2 text-sm text-foreground font-medium hover:text-foreground transition-colors">
-                            {isConnectionStringOpen ? (
-                              <>
-                                Hide connection string
-                                <ChevronUp size={16} />
-                              </>
-                            ) : (
-                              <>
-                                Show connection string
-                                <ChevronDown size={16} />
-                              </>
-                            )}
-                          </CollapsibleTrigger>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info size={14} className="text-muted-foreground" />
-                            </TooltipTrigger>
-                            <TooltipContent side="right">
-                              <p>View the full WebSocket URL with your current configuration</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                      </div>
-                      <CollapsibleContent>
-                        <div className="px-3 pb-3">
-                          <ConnectionString options={connectionOptions} />
-                        </div>
-                      </CollapsibleContent>
-                    </Collapsible>
-                  </TooltipProvider>
+                  <div className="p-3">
+                    <ConnectionString options={connectionOptions} />
+                  </div>
                 </div>
               </Card>
 

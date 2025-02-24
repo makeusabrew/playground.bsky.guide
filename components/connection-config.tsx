@@ -119,27 +119,19 @@ export default function ConnectionConfig({
             <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen} className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
-                  <CollapsibleTrigger className="flex items-center font-medium gap-2 text-sm text-foreground hover:text-foreground transition-colors">
+                  <CollapsibleTrigger className="flex items-center font-medium gap-1 text-sm text-foreground hover:text-foreground transition-colors">
                     {isAdvancedOpen ? (
                       <>
-                        Hide more options
+                        Less options
                         <ChevronUp size={16} />
                       </>
                     ) : (
                       <>
-                        Show more options
+                        More options
                         <ChevronDown size={16} />
                       </>
                     )}
                   </CollapsibleTrigger>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info size={14} className="text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent side="right">
-                      <p>Configure advanced connection settings like collections, DIDs, and cursor position</p>
-                    </TooltipContent>
-                  </Tooltip>
                 </div>
               </div>
 
@@ -177,7 +169,7 @@ export default function ConnectionConfig({
                         <Info size={14} className="text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent side="right">
-                        <p>Comma-separated list of DIDs (max 10,000)</p>
+                        <p>Comma-separated list of DIDs - Decentralized Identifiers, aka author IDs (max 10,000)</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
@@ -202,7 +194,7 @@ export default function ConnectionConfig({
                         <Info size={14} className="text-muted-foreground" />
                       </TooltipTrigger>
                       <TooltipContent side="right">
-                        <p>Unix timestamp in microseconds to start from (leave blank for latest)</p>
+                        <p>Unix timestamp in microseconds to begin streaming from (leave blank for latest)</p>
                       </TooltipContent>
                     </Tooltip>
                   </div>
