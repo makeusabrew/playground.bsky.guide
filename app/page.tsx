@@ -5,11 +5,13 @@ import MetricsDisplay from '@/components/metrics-display'
 import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
 import LiveFilters from '@/components/live-filters'
+import { NetworkActivityLog } from '@/components/network-activity-log'
 import { useMetrics } from './hooks/use-metrics'
 /* import { useShimmer } from './hooks/use-shimmer' */
 import { useConnection } from './hooks/use-connection'
 import { useFilters } from './hooks/use-filters'
 import { useJetstream } from './hooks/use-jetstream'
+import { useNetworkActivity } from './hooks/use-network-activity'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
@@ -17,7 +19,12 @@ export default function Home() {
   const { metrics, onMessage } = useMetrics()
   const [hasEverConnected, setHasEverConnected] = useState(false)
   const { connectionState, setConnectionState, connectionOptions, setConnectionOptions } = useConnection()
-  const jetstream = useJetstream({ ...connectionOptions, onMessage })
+  const { events: networkEvents, addEvent: addNetworkEvent } = useNetworkActivity(100)
+  const jetstream = useJetstream({
+    ...connectionOptions,
+    onMessage,
+    onNetworkEvent: (event) => addNetworkEvent(event),
+  })
   const messages = jetstream.messages
   const { filters, setFilters, filteredMessages } = useFilters(messages)
 
@@ -72,6 +79,7 @@ export default function Home() {
                   </div>
                 </div>
               </Card>
+
               <Card>
                 <ConnectionConfig
                   connectionState={connectionState}
@@ -85,6 +93,10 @@ export default function Home() {
                     <ConnectionString options={connectionOptions} />
                   </div>
                 </div>
+              </Card>
+
+              <Card>
+                <NetworkActivityLog events={networkEvents} />
               </Card>
             </div>
             <div className="md:col-span-6">
