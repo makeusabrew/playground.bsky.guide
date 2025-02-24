@@ -7,7 +7,7 @@ export function ConnectionString({ options }: { options: JetstreamConfig }) {
   const connectionStrings = buildConnectionString(options)
 
   return (
-    <div className="py-3">
+    <div>
       <div className="space-y-4">
         <h2 className="font-semibold">Connection string</h2>
 
