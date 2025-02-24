@@ -316,7 +316,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
 
   return (
     <Card className="h-[calc(100vh-100px)] flex flex-col">
-      <div className="p-3 border-b flex-none flex items-center justify-between">
+      <div className="py-1.5 px-3 border-b flex-none flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ScrollText size={16} className="text-muted-foreground hidden md:block" />
           <h2 className="font-semibold">Message stream</h2>
