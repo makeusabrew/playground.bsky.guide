@@ -41,21 +41,6 @@ export default function Home() {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
             <div className="md:col-span-3 space-y-5">
-              <Card>
-                <ConnectionConfig
-                  connectionState={connectionState}
-                  options={connectionOptions}
-                  setOptions={setConnectionOptions}
-                  hasEverConnected={hasEverConnected}
-                  setConnectionState={setConnectionState}
-                />
-                <div className="border-t">
-                  <div className="p-3">
-                    <ConnectionString options={connectionOptions} />
-                  </div>
-                </div>
-              </Card>
-
               <Card className="hidden md:block">
                 <div className="p-3 space-y-2">
                   <div className="flex items-center gap-2">
@@ -73,7 +58,7 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="text-xs sm:text-sm text-muted-foreground">
-                    This playground is a community-maintained (by{' '}
+                    This playground is a community-maintained tool by{' '}
                     <a
                       href="https://bsky.app/profile/makeusabrew.bsky.social"
                       className="underline hover:text-foreground"
@@ -81,9 +66,23 @@ export default function Home() {
                       rel="noopener noreferrer"
                     >
                       me
-                    </a>
-                    ) tool which lets you connect to and explore the Jetstream service directly from your browser.
-                    It&rsquo;s brand new, and I&rsquo;d love your feedback.
+                    </a>{' '}
+                    which lets you connect to and explore the Jetstream service directly from your browser. It&rsquo;s
+                    brand new, and I&rsquo;d love your feedback.
+                  </div>
+                </div>
+              </Card>
+              <Card>
+                <ConnectionConfig
+                  connectionState={connectionState}
+                  options={connectionOptions}
+                  setOptions={setConnectionOptions}
+                  hasEverConnected={hasEverConnected}
+                  setConnectionState={setConnectionState}
+                />
+                <div className="border-t">
+                  <div className="p-3">
+                    <ConnectionString options={connectionOptions} />
                   </div>
                 </div>
               </Card>
