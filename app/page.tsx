@@ -43,8 +43,8 @@ export default function Home() {
     <main className="flex-1">
       <div className="container mx-auto p-4 max-w-7xl">
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="md:col-span-3 space-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+            <div className="md:col-span-3 space-y-5">
               <Card>
                 <ConnectionConfig
                   connectionState={connectionState}
@@ -89,35 +89,36 @@ export default function Home() {
                     </Collapsible>
                   </TooltipProvider>
                 </div>
-                <div className="hidden md:block">
-                  <div className="border-t p-3 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <p className="text-xs sm:text-sm text-muted-foreground">
-                        <a
-                          href="https://github.com/bluesky-social/jetstream"
-                          className="underline hover:text-foreground"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Jetstream
-                        </a>{' '}
-                        is a Bluesky-operated WebSocket service that streams the Bluesky firehose as friendly JSON
-                        messages.
-                      </p>
-                    </div>
-                    <div className="text-xs sm:text-sm text-muted-foreground">
-                      This playground is a community-maintained (by{' '}
+              </Card>
+
+              <Card className="hidden md:block">
+                <div className="p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       <a
-                        href="https://bsky.app/profile/makeusabrew.bsky.social"
+                        href="https://github.com/bluesky-social/jetstream"
                         className="underline hover:text-foreground"
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        me
-                      </a>
-                      ) tool which lets you connect to and explore the Jetstream service directly from your browser.
-                      It&rsquo;s brand new, and I&rsquo;d love your feedback.
-                    </div>
+                        Jetstream
+                      </a>{' '}
+                      is a Bluesky-operated WebSocket service that streams the Bluesky firehose as friendly JSON
+                      messages.
+                    </p>
+                  </div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">
+                    This playground is a community-maintained (by{' '}
+                    <a
+                      href="https://bsky.app/profile/makeusabrew.bsky.social"
+                      className="underline hover:text-foreground"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      me
+                    </a>
+                    ) tool which lets you connect to and explore the Jetstream service directly from your browser.
+                    It&rsquo;s brand new, and I&rsquo;d love your feedback.
                   </div>
                 </div>
               </Card>
@@ -125,7 +126,7 @@ export default function Home() {
             <div className="md:col-span-6">
               <StreamViewer messages={messages} filteredMessages={filteredMessages} />
             </div>
-            <div className="md:col-span-3 space-y-3">
+            <div className="md:col-span-3 space-y-5">
               <Card>
                 <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
               </Card>
