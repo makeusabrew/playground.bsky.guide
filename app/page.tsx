@@ -3,7 +3,7 @@ import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
 import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
-import { NetworkActivitySheet } from '@/components/network-activity-sheet'
+import { NetworkActivityOverlay } from '@/components/network-activity-overlay'
 import { SidebarTabs } from '@/components/sidebar-tabs'
 import { useMetrics } from './hooks/use-metrics'
 /* import { useShimmer } from './hooks/use-shimmer' */
@@ -109,10 +109,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Fixed position network activity sheet trigger */}
-      <div className="fixed bottom-4 right-4 z-40">
-        <NetworkActivitySheet events={networkEvents} />
-      </div>
+      {/* Network activity overlay */}
+      <NetworkActivityOverlay events={networkEvents} />
     </main>
   )
 }

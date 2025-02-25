@@ -71,60 +71,60 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
       <div className="mb-4">
         <h3 className="text-sm font-medium mb-2">Event types</h3>
         <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Plus size={14} />
-              <span className="text-sm">Creates</span>
-            </div>
+          <div className="flex items-center space-x-2">
             <Switch
               checked={filters.showCreates}
               onCheckedChange={(checked) => updateFilter('showCreates', checked)}
               disabled={disabled}
             />
-          </div>
-          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Pencil size={14} />
-              <span className="text-sm">Updates</span>
+              <Plus size={14} />
+              <span className="text-sm">Creates</span>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
             <Switch
               checked={filters.showUpdates}
               onCheckedChange={(checked) => updateFilter('showUpdates', checked)}
               disabled={disabled}
             />
-          </div>
-          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Trash size={14} />
-              <span className="text-sm">Deletes</span>
+              <Pencil size={14} />
+              <span className="text-sm">Updates</span>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
             <Switch
               checked={filters.showDeletes}
               onCheckedChange={(checked) => updateFilter('showDeletes', checked)}
               disabled={disabled}
             />
-          </div>
-          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <UserRound size={14} />
-              <span className="text-sm">Identity</span>
+              <Trash size={14} />
+              <span className="text-sm">Deletes</span>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
             <Switch
               checked={filters.showIdentity}
               onCheckedChange={(checked) => updateFilter('showIdentity', checked)}
               disabled={disabled}
             />
-          </div>
-          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <ShieldCheck size={14} />
-              <span className="text-sm">Account</span>
+              <UserRound size={14} />
+              <span className="text-sm">Identity</span>
             </div>
+          </div>
+          <div className="flex items-center space-x-2">
             <Switch
               checked={filters.showAccount}
               onCheckedChange={(checked) => updateFilter('showAccount', checked)}
               disabled={disabled}
             />
+            <div className="flex items-center space-x-2">
+              <ShieldCheck size={14} />
+              <span className="text-sm">Account</span>
+            </div>
           </div>
         </div>
       </div>

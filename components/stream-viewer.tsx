@@ -320,9 +320,6 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
         <div className="flex items-center gap-2">
           <ScrollText size={16} className="text-muted-foreground hidden md:block" />
           <h2 className="font-semibold">Message stream</h2>
-          <Badge variant="outline" className="ml-2">
-            {displayMessages.length} / {messages.length}
-          </Badge>
         </div>
 
         <div className="flex items-center gap-2">
