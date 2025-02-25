@@ -316,29 +316,31 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
 
   return (
     <Card className="h-[calc(100vh-100px)] flex flex-col">
-      <div className="py-1.5 px-3 border-b flex-none flex items-center justify-between">
+      <div className="py-2 px-4 border-b flex-none flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ScrollText size={16} className="text-muted-foreground hidden md:block" />
           <h2 className="font-semibold">Message stream</h2>
+          <Badge variant="outline" className="ml-2">
+            {displayMessages.length} / {messages.length}
+          </Badge>
         </div>
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="ghost"
-            size="sm"
-            className={
-              isViewFrozen ? 'text-blue-600 hover:text-blue-700' : 'text-muted-foreground hover:text-foreground'
-            }
-            onClick={handleFreezeToggle}
-            title={isViewFrozen ? 'Unfreeze view' : 'Freeze view'}
-          >
-            {isViewFrozen ? <EyeOff size={16} /> : <Eye size={16} />}
-            <span className="text-xs">{isViewFrozen ? 'Frozen' : 'Live'}</span>
-          </Button>
+
+        <div className="flex items-center gap-2">
           {lag !== null && (
             <Badge variant="outline" className={`text-xs ${getLagStyles(lag)}`}>
               Lag: {lag < 1000 ? `${Math.max(lag, 0)}ms` : `${(lag / 1000).toFixed(1)}s`}
             </Badge>
           )}
+          <Button
+            variant={isViewFrozen ? 'default' : 'outline'}
+            size="sm"
+            className="gap-1"
+            onClick={handleFreezeToggle}
+            title={isViewFrozen ? 'Resume live updates' : 'Pause live updates'}
+          >
+            {isViewFrozen ? <EyeOff size={14} /> : <Eye size={14} />}
+            <span className="text-xs">{isViewFrozen ? 'Frozen' : 'Live'}</span>
+          </Button>
         </div>
       </div>
 

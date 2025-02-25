@@ -1,11 +1,10 @@
 'use client'
 import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
-import MetricsDisplay from '@/components/metrics-display'
 import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
-import LiveFilters from '@/components/live-filters'
-import { NetworkActivityLog } from '@/components/network-activity-log'
+import { NetworkActivitySheet } from '@/components/network-activity-sheet'
+import { SidebarTabs } from '@/components/sidebar-tabs'
 import { useMetrics } from './hooks/use-metrics'
 /* import { useShimmer } from './hooks/use-shimmer' */
 import { useConnection } from './hooks/use-connection'
@@ -94,24 +93,25 @@ export default function Home() {
                   </div>
                 </div>
               </Card>
-
-              <Card>
-                <NetworkActivityLog events={networkEvents} />
-              </Card>
             </div>
             <div className="md:col-span-6">
               <StreamViewer messages={messages} filteredMessages={filteredMessages} />
             </div>
-            <div className="md:col-span-3 space-y-5">
-              <Card>
-                <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
-              </Card>
-              <Card>
-                <MetricsDisplay metrics={metrics} />
-              </Card>
+            <div className="md:col-span-3">
+              <SidebarTabs
+                filters={filters}
+                onFiltersChange={setFilters}
+                metrics={metrics}
+                disabled={!connectionState.connected}
+              />
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Fixed position network activity sheet trigger */}
+      <div className="fixed bottom-4 right-4 z-40">
+        <NetworkActivitySheet events={networkEvents} />
       </div>
     </main>
   )

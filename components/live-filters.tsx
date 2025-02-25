@@ -13,7 +13,6 @@ import {
   Users,
   Ban,
   User,
-  Filter,
 } from 'lucide-react'
 
 /**
@@ -67,125 +66,109 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
   }
 
   return (
-    <div className={`p-3 ${disabled ? 'opacity-100' : ''}`}>
-      <div className="space-y-6">
-        <div className="flex items-center justify-between border-b pb-3 -mx-3 px-3">
-          <h2 className="font-semibold flex items-center gap-2">
-            <Filter size={16} className="text-muted-foreground hidden md:block" />
-            Live filters
-          </h2>
-          {/* <p className="text-sm text-muted-foreground">Filter the stream in real-time</p> */}
+    <div className="p-3">
+      {/* Event Types Section */}
+      <div className="mb-4">
+        <h3 className="text-sm font-medium mb-2">Event types</h3>
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Plus size={14} />
+              <span className="text-sm">Creates</span>
+            </div>
+            <Switch
+              checked={filters.showCreates}
+              onCheckedChange={(checked) => updateFilter('showCreates', checked)}
+              disabled={disabled}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Pencil size={14} />
+              <span className="text-sm">Updates</span>
+            </div>
+            <Switch
+              checked={filters.showUpdates}
+              onCheckedChange={(checked) => updateFilter('showUpdates', checked)}
+              disabled={disabled}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Trash size={14} />
+              <span className="text-sm">Deletes</span>
+            </div>
+            <Switch
+              checked={filters.showDeletes}
+              onCheckedChange={(checked) => updateFilter('showDeletes', checked)}
+              disabled={disabled}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <UserRound size={14} />
+              <span className="text-sm">Identity</span>
+            </div>
+            <Switch
+              checked={filters.showIdentity}
+              onCheckedChange={(checked) => updateFilter('showIdentity', checked)}
+              disabled={disabled}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <ShieldCheck size={14} />
+              <span className="text-sm">Account</span>
+            </div>
+            <Switch
+              checked={filters.showAccount}
+              onCheckedChange={(checked) => updateFilter('showAccount', checked)}
+              disabled={disabled}
+            />
+          </div>
         </div>
+      </div>
 
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Collections</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {Object.entries(COMMON_COLLECTIONS).map(([collection, name]) => (
-                <div key={collection} className="flex items-center space-x-2">
-                  <Switch
-                    id={collection}
-                    checked={filters.selectedCollections.includes(collection)}
-                    onCheckedChange={(checked) => {
-                      updateFilter(
-                        'selectedCollections',
-                        checked
-                          ? [...filters.selectedCollections, collection]
-                          : filters.selectedCollections.filter((c) => c !== collection)
-                      )
-                    }}
-                  />
-                  <label htmlFor={collection} className="text-sm flex items-center gap-1.5 min-w-0 truncate">
-                    {COLLECTION_ICONS[collection]}
-                    {name}
-                  </label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Commit operations</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="creates"
-                  checked={filters.showCreates}
-                  onCheckedChange={(checked) => updateFilter('showCreates', checked)}
-                />
-                <label htmlFor="creates" className="text-sm flex items-center gap-1.5">
-                  <Plus size={14} />
-                  Creates
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="updates"
-                  checked={filters.showUpdates}
-                  onCheckedChange={(checked) => updateFilter('showUpdates', checked)}
-                />
-                <label htmlFor="updates" className="text-sm flex items-center gap-1.5">
-                  <Pencil size={14} />
-                  Updates
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="deletes"
-                  checked={filters.showDeletes}
-                  onCheckedChange={(checked) => updateFilter('showDeletes', checked)}
-                />
-                <label htmlFor="deletes" className="text-sm flex items-center gap-1.5">
-                  <Trash size={14} />
-                  Deletes
-                </label>
-              </div>
-            </div>
-          </div>
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Extra events</h3>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="identity"
-                  checked={filters.showIdentity}
-                  onCheckedChange={(checked) => updateFilter('showIdentity', checked)}
-                />
-                <label htmlFor="identity" className="text-sm flex items-center gap-1.5">
-                  <UserRound size={14} />
-                  Identity
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="account"
-                  checked={filters.showAccount}
-                  onCheckedChange={(checked) => updateFilter('showAccount', checked)}
-                />
-                <label htmlFor="account" className="text-sm flex items-center gap-1.5">
-                  <ShieldCheck size={14} />
-                  Account
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* <div className="space-y-3">
-            <h3 className="text-sm font-medium">DID filter</h3>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Enter DID to filter"
-                value={filters.didFilter}
-                onChange={(e) => updateFilter('didFilter', e.target.value)}
+      {/* Collections Section */}
+      <div className="mb-4">
+        <h3 className="text-sm font-medium mb-2">Collections</h3>
+        <div className="grid grid-cols-2 gap-2">
+          {Object.entries(COMMON_COLLECTIONS).map(([collection, label]) => (
+            <div key={collection} className="flex items-center space-x-2">
+              <Switch
+                checked={filters.selectedCollections.includes(collection)}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    updateFilter('selectedCollections', [...filters.selectedCollections, collection])
+                  } else {
+                    updateFilter(
+                      'selectedCollections',
+                      filters.selectedCollections.filter((c) => c !== collection)
+                    )
+                  }
+                }}
+                disabled={disabled}
               />
-              {filters.didFilter && (
-                <Button variant="outline" size="icon" onClick={() => updateFilter('didFilter', '')}>
-                  <X size={16} />
-                </Button>
-              )}
+              <div className="flex items-center space-x-1">
+                {COLLECTION_ICONS[collection]}
+                <span className="text-sm">{label}</span>
+              </div>
             </div>
-          </div> */}
+          ))}
         </div>
+      </div>
+
+      {/* DID Filter Section */}
+      <div>
+        <h3 className="text-sm font-medium mb-2">DID filter</h3>
+        <input
+          type="text"
+          placeholder="Filter by DID"
+          className="border rounded px-2 py-1 w-full focus:outline-none focus:ring-1 focus:ring-blue-400 text-sm"
+          value={filters.didFilter}
+          onChange={(e) => updateFilter('didFilter', e.target.value)}
+          disabled={disabled}
+        />
       </div>
     </div>
   )
