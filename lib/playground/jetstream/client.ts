@@ -81,36 +81,8 @@ export const createWebSocketClient = (options: WebSocketClientOptions) => {
     }
   }
 
-  const send = (data: string) => {
-    if (ws?.readyState === WebSocket.OPEN) {
-      options.onNetworkEvent?.({
-        type: 'websocket',
-        action: 'Sending message',
-        status: 'pending',
-        details: data.substring(0, 100) + (data.length > 100 ? '...' : ''),
-      })
-
-      try {
-        ws.send(data)
-        options.onNetworkEvent?.({
-          type: 'websocket',
-          action: 'Message sent',
-          status: 'success',
-        })
-      } catch (error) {
-        options.onNetworkEvent?.({
-          type: 'websocket',
-          action: 'Send failed',
-          status: 'error',
-          details: error instanceof Error ? error.message : 'Unknown error',
-        })
-      }
-    }
-  }
-
   return {
     connect,
     disconnect,
-    send,
   }
 }
