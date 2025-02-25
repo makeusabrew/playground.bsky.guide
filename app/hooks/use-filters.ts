@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { FilterOptions, COMMON_COLLECTIONS } from '@/components/live-filters'
 import { JetstreamEvent } from '@/lib/playground/jetstream/types'
 import { getNestedValue, matchesFilter } from '@/lib/utils'
-import { SmartFilterRule } from '@/components/smart-filter'
+import { PropertyFilterRule } from '@/components/property-filter'
 
 export function useFilters(messages: JetstreamEvent[]) {
   const [filters, setFilters] = useState<FilterOptions>({
@@ -15,20 +15,20 @@ export function useFilters(messages: JetstreamEvent[]) {
     didFilter: '',
   })
 
-  const [smartFilters, setSmartFilters] = useState<SmartFilterRule[]>([])
+  const [propertyFilters, setPropertyFilters] = useState<PropertyFilterRule[]>([])
 
-  const filteredMessages = filterMessages(messages, filters, smartFilters)
+  const filteredMessages = filterMessages(messages, filters, propertyFilters)
 
   return {
     filters,
     setFilters,
-    smartFilters,
-    setSmartFilters,
+    propertyFilters,
+    setPropertyFilters,
     filteredMessages,
   }
 }
 
-function filterMessages(messages: JetstreamEvent[], filters: FilterOptions, smartFilters: SmartFilterRule[]) {
+function filterMessages(messages: JetstreamEvent[], filters: FilterOptions, propertyFilters: PropertyFilterRule[]) {
   return messages.filter((msg) => {
     // Filter by event kind
     if (msg.kind === 'identity' && !filters.showIdentity) return false
@@ -50,10 +50,10 @@ function filterMessages(messages: JetstreamEvent[], filters: FilterOptions, smar
       return false
     }
 
-    // Apply smart filters
-    if (smartFilters.length > 0) {
-      // Message must match ALL smart filters (AND logic)
-      return smartFilters.every((filter) => {
+    // Apply property filters
+    if (propertyFilters.length > 0) {
+      // Message must match ALL property filters (AND logic)
+      return propertyFilters.every((filter) => {
         const value = getNestedValue(msg as unknown as Record<string, unknown>, filter.path)
         return matchesFilter(value, filter.value)
       })

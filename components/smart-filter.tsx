@@ -3,23 +3,22 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Label } from './ui/label'
 import { Plus, X } from 'lucide-react'
-import { Badge } from './ui/badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip'
 import { Card } from './ui/card'
 
-export interface SmartFilterRule {
+export interface PropertyFilterRule {
   id: string
   path: string
   value: string
 }
 
-interface SmartFilterProps {
-  filters: SmartFilterRule[]
-  onFiltersChange: (filters: SmartFilterRule[]) => void
+interface PropertyFilterProps {
+  filters: PropertyFilterRule[]
+  onFiltersChange: (filters: PropertyFilterRule[]) => void
   disabled: boolean
 }
 
-export default function SmartFilter({ filters, onFiltersChange, disabled }: SmartFilterProps) {
+export default function PropertyFilter({ filters, onFiltersChange, disabled }: PropertyFilterProps) {
   const [newPath, setNewPath] = useState('')
   const [newValue, setNewValue] = useState('')
 
@@ -48,7 +47,7 @@ export default function SmartFilter({ filters, onFiltersChange, disabled }: Smar
     <div className="space-y-4">
       <div className="space-y-2">
         <div className="flex items-center gap-1">
-          <Label htmlFor="path">Smart filter</Label>
+          <Label htmlFor="path">Property filter</Label>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -58,7 +57,7 @@ export default function SmartFilter({ filters, onFiltersChange, disabled }: Smar
               </TooltipTrigger>
               <TooltipContent className="max-w-80">
                 <p>
-                  Filter events by any nested property using dot notation.
+                  Filter events by any property using dot notation.
                   <br />
                   Examples:
                   <br />- <code>did</code> (filter by DID)
@@ -69,33 +68,44 @@ export default function SmartFilter({ filters, onFiltersChange, disabled }: Smar
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="flex gap-2">
-          <div className="flex-1">
+
+        {/* Stack inputs vertically for better space usage */}
+        <div className="space-y-2">
+          <div>
+            <Label htmlFor="path" className="text-xs text-muted-foreground">
+              Path
+            </Label>
             <Input
               id="path"
-              placeholder="Path (e.g. commit.collection)"
+              placeholder="e.g. commit.collection"
               value={newPath}
               onChange={(e) => setNewPath(e.target.value)}
               disabled={disabled}
+              className="mt-1"
             />
           </div>
-          <div className="flex-1">
-            <Input
-              id="value"
-              placeholder="Value"
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
-              disabled={disabled}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  addFilter()
-                }
-              }}
-            />
+          <div>
+            <Label htmlFor="value" className="text-xs text-muted-foreground">
+              Value
+            </Label>
+            <div className="flex gap-2 mt-1">
+              <Input
+                id="value"
+                placeholder="Value to filter by"
+                value={newValue}
+                onChange={(e) => setNewValue(e.target.value)}
+                disabled={disabled}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    addFilter()
+                  }
+                }}
+              />
+              <Button type="button" size="icon" onClick={addFilter} disabled={disabled || !newPath || !newValue}>
+                <Plus size={16} />
+              </Button>
+            </div>
           </div>
-          <Button type="button" size="icon" onClick={addFilter} disabled={disabled || !newPath || !newValue}>
-            <Plus size={16} />
-          </Button>
         </div>
       </div>
 
@@ -103,23 +113,25 @@ export default function SmartFilter({ filters, onFiltersChange, disabled }: Smar
         <div className="space-y-2">
           <Label>Active filters</Label>
           <Card className="p-2">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col gap-2">
               {filters.map((filter) => (
-                <Badge key={filter.id} variant="secondary" className="flex items-center gap-1">
-                  <span className="font-mono text-xs">
-                    {filter.path}:{filter.value}
-                  </span>
+                <div key={filter.id} className="flex items-center justify-between gap-2 w-full">
+                  <div className="overflow-hidden">
+                    <div className="font-mono text-xs truncate">
+                      <span className="font-semibold">{filter.path}:</span> {filter.value}
+                    </div>
+                  </div>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-4 w-4 p-0"
+                    className="h-6 w-6 p-0 flex-shrink-0"
                     onClick={() => removeFilter(filter.id)}
                     disabled={disabled}
                   >
-                    <X size={12} />
+                    <X size={14} />
                   </Button>
-                </Badge>
+                </div>
               ))}
             </div>
           </Card>

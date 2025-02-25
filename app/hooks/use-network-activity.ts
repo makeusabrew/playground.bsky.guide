@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 import { NetworkEvent } from '@/components/network-activity-log'
-import { v4 as uuidv4 } from 'uuid'
 
 export function useNetworkActivity(maxEvents = 100) {
   const [events, setEvents] = useState<NetworkEvent[]>([])
@@ -9,7 +8,7 @@ export function useNetworkActivity(maxEvents = 100) {
     (event: Omit<NetworkEvent, 'id' | 'timestamp'>) => {
       const newEvent: NetworkEvent = {
         ...event,
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         timestamp: Date.now(),
       }
       setEvents((prev) => {

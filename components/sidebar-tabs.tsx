@@ -4,7 +4,7 @@ import LiveFilters from '@/components/live-filters'
 import MetricsDisplay from '@/components/metrics-display'
 import { BarChart3Icon, FilterIcon } from 'lucide-react'
 import { FilterOptions } from '@/components/live-filters'
-import { SmartFilterRule } from '@/components/smart-filter'
+import { PropertyFilterRule } from '@/components/property-filter'
 
 type JetstreamMetrics = {
   // Totals
@@ -28,17 +28,19 @@ type JetstreamMetrics = {
 interface SidebarTabsProps {
   filters: FilterOptions
   onFiltersChange: (filters: FilterOptions) => void
-  smartFilters: SmartFilterRule[]
-  onSmartFiltersChange: (filters: SmartFilterRule[]) => void
+  propertyFilters: PropertyFilterRule[]
+  onPropertyFiltersChange: (filters: PropertyFilterRule[]) => void
   metrics: JetstreamMetrics
+  disabled?: boolean
 }
 
 export function SidebarTabs({
   filters,
   onFiltersChange,
-  smartFilters,
-  onSmartFiltersChange,
+  propertyFilters,
+  onPropertyFiltersChange,
   metrics,
+  disabled = false,
 }: SidebarTabsProps) {
   return (
     <Card className="h-[calc(100vh-100px)]">
@@ -58,8 +60,9 @@ export function SidebarTabs({
           <LiveFilters
             filters={filters}
             onFiltersChange={onFiltersChange}
-            smartFilters={smartFilters}
-            onSmartFiltersChange={onSmartFiltersChange}
+            propertyFilters={propertyFilters}
+            onPropertyFiltersChange={onPropertyFiltersChange}
+            disabled={disabled}
           />
         </TabsContent>
 

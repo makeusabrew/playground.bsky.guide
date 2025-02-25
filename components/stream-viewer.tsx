@@ -324,9 +324,9 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
 
         <div className="flex items-center gap-2">
           {lag !== null && (
-            <Badge variant="outline" className={`text-xs ${getLagStyles(lag)}`}>
+            <div className={`text-xs ${getLagStyles(lag)} px-2 py-1 rounded-sm ring-0 ring-gray-200 `}>
               Lag: {lag < 1000 ? `${Math.max(lag, 0)}ms` : `${(lag / 1000).toFixed(1)}s`}
-            </Badge>
+            </div>
           )}
           <Button
             variant={isViewFrozen ? 'default' : 'outline'}

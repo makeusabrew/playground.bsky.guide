@@ -14,7 +14,7 @@ import {
   Ban,
   User,
 } from 'lucide-react'
-import SmartFilter, { SmartFilterRule } from './smart-filter'
+import PropertyFilter, { PropertyFilterRule } from './property-filter'
 
 /**
  * TODO: segment the filters properly here - we've got "identity" and "account" as "event types"
@@ -55,16 +55,16 @@ export interface FilterOptions {
 interface LiveFiltersProps {
   filters: FilterOptions
   onFiltersChange: (filters: FilterOptions) => void
-  smartFilters: SmartFilterRule[]
-  onSmartFiltersChange: (filters: SmartFilterRule[]) => void
+  propertyFilters: PropertyFilterRule[]
+  onPropertyFiltersChange: (filters: PropertyFilterRule[]) => void
   disabled: boolean
 }
 
 export default function LiveFilters({
   filters,
   onFiltersChange,
-  smartFilters,
-  onSmartFiltersChange,
+  propertyFilters,
+  onPropertyFiltersChange,
   disabled,
 }: LiveFiltersProps) {
   const updateFilter = <K extends keyof FilterOptions>(key: K, value: FilterOptions[K]) => {
@@ -167,9 +167,9 @@ export default function LiveFilters({
         </div>
       </div>
 
-      {/* Smart Filter Section */}
+      {/* Property Filter Section */}
       <div className="mb-4">
-        <SmartFilter filters={smartFilters} onFiltersChange={onSmartFiltersChange} disabled={disabled} />
+        <PropertyFilter filters={propertyFilters} onFiltersChange={onPropertyFiltersChange} disabled={disabled} />
       </div>
 
       {/* Legacy DID Filter - Hidden but kept for backward compatibility */}
