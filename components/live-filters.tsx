@@ -14,6 +14,7 @@ import {
   Ban,
   User,
 } from 'lucide-react'
+import SmartFilter, { SmartFilterRule } from './smart-filter'
 
 /**
  * TODO: segment the filters properly here - we've got "identity" and "account" as "event types"
@@ -54,10 +55,18 @@ export interface FilterOptions {
 interface LiveFiltersProps {
   filters: FilterOptions
   onFiltersChange: (filters: FilterOptions) => void
+  smartFilters: SmartFilterRule[]
+  onSmartFiltersChange: (filters: SmartFilterRule[]) => void
   disabled: boolean
 }
 
-export default function LiveFilters({ filters, onFiltersChange, disabled }: LiveFiltersProps) {
+export default function LiveFilters({
+  filters,
+  onFiltersChange,
+  smartFilters,
+  onSmartFiltersChange,
+  disabled,
+}: LiveFiltersProps) {
   const updateFilter = <K extends keyof FilterOptions>(key: K, value: FilterOptions[K]) => {
     onFiltersChange({
       ...filters,
@@ -158,8 +167,13 @@ export default function LiveFilters({ filters, onFiltersChange, disabled }: Live
         </div>
       </div>
 
-      {/* DID Filter Section */}
-      <div>
+      {/* Smart Filter Section */}
+      <div className="mb-4">
+        <SmartFilter filters={smartFilters} onFiltersChange={onSmartFiltersChange} disabled={disabled} />
+      </div>
+
+      {/* Legacy DID Filter - Hidden but kept for backward compatibility */}
+      <div className="hidden">
         <h3 className="text-sm font-medium mb-2">DID filter</h3>
         <input
           type="text"

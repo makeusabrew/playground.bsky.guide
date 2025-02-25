@@ -25,7 +25,7 @@ export default function Home() {
     onNetworkEvent: (event) => addNetworkEvent(event),
   })
   const messages = jetstream.messages
-  const { filters, setFilters, filteredMessages } = useFilters(messages)
+  const { filters, setFilters, smartFilters, setSmartFilters, filteredMessages } = useFilters(messages)
 
   // Handle connection state changes
   useEffect(() => {
@@ -101,8 +101,9 @@ export default function Home() {
               <SidebarTabs
                 filters={filters}
                 onFiltersChange={setFilters}
+                smartFilters={smartFilters}
+                onSmartFiltersChange={setSmartFilters}
                 metrics={metrics}
-                disabled={!connectionState.connected}
               />
             </div>
           </div>

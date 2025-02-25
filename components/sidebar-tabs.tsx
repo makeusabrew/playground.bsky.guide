@@ -4,6 +4,7 @@ import LiveFilters from '@/components/live-filters'
 import MetricsDisplay from '@/components/metrics-display'
 import { BarChart3Icon, FilterIcon } from 'lucide-react'
 import { FilterOptions } from '@/components/live-filters'
+import { SmartFilterRule } from '@/components/smart-filter'
 
 type JetstreamMetrics = {
   // Totals
@@ -27,11 +28,18 @@ type JetstreamMetrics = {
 interface SidebarTabsProps {
   filters: FilterOptions
   onFiltersChange: (filters: FilterOptions) => void
+  smartFilters: SmartFilterRule[]
+  onSmartFiltersChange: (filters: SmartFilterRule[]) => void
   metrics: JetstreamMetrics
-  disabled?: boolean
 }
 
-export function SidebarTabs({ filters, onFiltersChange, metrics, disabled = false }: SidebarTabsProps) {
+export function SidebarTabs({
+  filters,
+  onFiltersChange,
+  smartFilters,
+  onSmartFiltersChange,
+  metrics,
+}: SidebarTabsProps) {
   return (
     <Card className="h-[calc(100vh-100px)]">
       <Tabs defaultValue="filters" className="h-full flex flex-col">
@@ -47,7 +55,12 @@ export function SidebarTabs({ filters, onFiltersChange, metrics, disabled = fals
         </TabsList>
 
         <TabsContent value="filters" className="flex-1 overflow-auto px-0">
-          <LiveFilters filters={filters} onFiltersChange={onFiltersChange} disabled={disabled} />
+          <LiveFilters
+            filters={filters}
+            onFiltersChange={onFiltersChange}
+            smartFilters={smartFilters}
+            onSmartFiltersChange={onSmartFiltersChange}
+          />
         </TabsContent>
 
         <TabsContent value="metrics" className="flex-1 overflow-auto px-0">
