@@ -21,6 +21,7 @@ import {
   EyeOff,
   ChevronRight,
   Activity,
+  X,
 } from 'lucide-react'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
@@ -32,8 +33,6 @@ interface StreamViewerProps {
   messages: JetstreamEvent[]
   filteredMessages: JetstreamEvent[]
 }
-
-type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
 
 const getOperationIcon = (operation: string) => {
   switch (operation) {
@@ -99,6 +98,32 @@ interface PostRecord {
       }
     }>
   }
+}
+
+const ExpandedMessage = ({ msg, onClose }: { msg: JetstreamEvent; onClose: () => void }) => {
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+    >
+      <div
+        className={`relative w-[90%] max-w-3xl max-h-[90vh] overflow-auto rounded-lg ${getEventColor(
+          msg
+        )} dark:bg-slate-900 p-4 border border-border/50`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800"
+        >
+          <X size={16} />
+        </button>
+        <div className="font-mono whitespace-pre-wrap break-all text-[10px] mt-4">{JSON.stringify(msg, null, 2)}</div>
+      </div>
+    </div>
+  )
 }
 
 const MessageSummary = ({
@@ -174,6 +199,10 @@ const MessageSummary = ({
         e.preventDefault()
         onExpandChange(!isExpanded)
       }
+      if (e.key === 'Escape' && isExpanded) {
+        e.preventDefault()
+        onExpandChange(false)
+      }
     }
 
     document.addEventListener('keydown', handleKeyDown)
@@ -181,73 +210,83 @@ const MessageSummary = ({
   }, [isExpanded, onExpandChange])
 
   return (
-    <div
-      ref={messageRef}
-      className={`group ${getEventColor(
-        msg
-      )} dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800/50 h-16 rounded-md text-xs transition-all overflow-hidden border border-border/50 ${
-        isExpanded ? 'h-auto' : ''
-      }`}
-      onClick={() => onExpandChange(!isExpanded)}
-      tabIndex={0}
-      role="button"
-      aria-expanded={isExpanded}
-      data-index={index}
-    >
-      <div className="p-2">
-        <div className="flex items-center gap-2 justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground tabular-nums">
-              {format(Math.floor(msg.time_us / 1000), 'HH:mm:ss.SSS')}
-            </span>
-            {/* Operation type */}
-            <div className="w-[60px] flex items-center gap-1.5 font-medium">
-              {msg.kind === 'commit' ? (
-                <>
-                  {getOperationIcon(msg.commit.operation)}
-                  {msg.commit.operation}
-                </>
-              ) : msg.kind === 'identity' ? (
-                <>
-                  <UserRound size={14} />
-                  {msg.kind}
-                </>
-              ) : (
-                <>
-                  <ShieldCheck size={14} />
-                  {msg.kind}
-                </>
+    <div className="relative">
+      <div
+        ref={messageRef}
+        className={`group ${getEventColor(
+          msg
+        )} dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800/50 h-16 rounded-md text-xs transition-all overflow-hidden border border-border/50`}
+        onClick={() => onExpandChange(!isExpanded)}
+        tabIndex={0}
+        role="button"
+        aria-expanded={isExpanded}
+        data-index={index}
+      >
+        <div className="p-2">
+          <div className="flex items-center gap-2 justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground tabular-nums">
+                {format(Math.floor(msg.time_us / 1000), 'HH:mm:ss.SSS')}
+              </span>
+              {/* Operation type */}
+              <div className="w-[60px] flex items-center gap-1.5 font-medium">
+                {msg.kind === 'commit' ? (
+                  <>
+                    {getOperationIcon(msg.commit.operation)}
+                    {msg.commit.operation}
+                  </>
+                ) : msg.kind === 'identity' ? (
+                  <>
+                    <UserRound size={14} />
+                    {msg.kind}
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck size={14} />
+                    {msg.kind}
+                  </>
+                )}
+              </div>
+
+              {/* Collection type */}
+              {msg.kind === 'commit' && (
+                <div className="w-[48px] flex items-center gap-1.5 text-muted-foreground">
+                  {getCollectionIcon(msg.commit.collection)}
+                  {msg.commit.collection.split('.').pop()}
+                </div>
               )}
             </div>
 
-            {/* Collection type */}
-            {msg.kind === 'commit' && (
-              <div className="w-[48px] flex items-center gap-1.5 text-muted-foreground">
-                {getCollectionIcon(msg.commit.collection)}
-                {msg.commit.collection.split('.').pop()}
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              <RecordLinks event={msg} />
+              <ChevronRight
+                size={16}
+                className={`text-muted-foreground/50 transition-transform ${
+                  isExpanded ? 'rotate-90' : ''
+                } opacity-100 group-hover:opacity-100`}
+              />
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <RecordLinks event={msg} />
-            <ChevronRight
-              size={16}
-              className={`text-muted-foreground/50 transition-transform ${
-                isExpanded ? 'rotate-90' : ''
-              } opacity-100 group-hover:opacity-100`}
-            />
-          </div>
+          <div className="mt-2 text-muted-foreground">{getSummary()}</div>
         </div>
-
-        <div className="mt-2 text-muted-foreground">{getSummary()}</div>
-
-        {isExpanded && (
-          <div className="mt-3 pt-3 border-t font-mono whitespace-pre-wrap break-all text-[10px]">
-            {JSON.stringify(msg, null, 2)}
-          </div>
-        )}
       </div>
+
+      {isExpanded && (
+        <div
+          className={`absolute left-0 right-0 z-50 mt-1 rounded-lg ${getEventColor(
+            msg
+          )} dark:bg-slate-900/95 bg-opacity-95 backdrop-blur-sm p-4 border border-border/50 shadow-lg`}
+        >
+          <button
+            onClick={() => onExpandChange(false)}
+            className="absolute top-2 right-2 p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800"
+          >
+            <X size={16} />
+          </button>
+          <div className="font-mono whitespace-pre-wrap break-all text-[10px] mt-4">{JSON.stringify(msg, null, 2)}</div>
+        </div>
+      )}
     </div>
   )
 }
@@ -261,17 +300,17 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   const [velocity, setVelocity] = useState(0)
   const lastMessageCountRef = useRef(0)
   const lastUpdateTimeRef = useRef(Date.now())
-  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set())
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
 
   const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages
 
-  // Virtualizer setup with dynamic height
+  // Virtualizer setup with fixed height
   const virtualizer = useVirtualizer({
     count: displayMessages.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: (index) => (expandedIndices.has(index) ? 300 : 72), // Expanded messages get more space
+    estimateSize: () => 64, // Back to fixed height since expanded view is in an overlay
     overscan: 5,
-    getItemKey: (index) => `${displayMessages[index].time_us}-${index}`,
+    gap: 10,
   })
 
   // Keep latest message time updated
@@ -339,15 +378,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   }
 
   const handleMessageExpand = (index: number, isExpanded: boolean) => {
-    setExpandedIndices((prev) => {
-      const next = new Set(prev)
-      if (isExpanded) {
-        next.add(index)
-      } else {
-        next.delete(index)
-      }
-      return next
-    })
+    setExpandedIndex(isExpanded ? index : null)
   }
 
   return (
@@ -410,21 +441,18 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
                 <div
                   key={virtualRow.key}
                   data-index={virtualRow.index}
-                  ref={virtualizer.measureElement}
                   style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
-                    height: 'auto',
                     transform: `translateY(${virtualRow.start}px)`,
-                    zIndex: expandedIndices.has(virtualRow.index) ? 10 : 'auto',
                   }}
                 >
                   <MessageSummary
                     msg={msg}
                     index={virtualRow.index}
-                    isExpanded={expandedIndices.has(virtualRow.index)}
+                    isExpanded={expandedIndex === virtualRow.index}
                     onExpandChange={(expanded) => handleMessageExpand(virtualRow.index, expanded)}
                   />
                 </div>
