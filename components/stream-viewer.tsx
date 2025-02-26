@@ -99,6 +99,85 @@ const getEventBadgeColor = (event: JetstreamEvent): BadgeVariant => {
   return 'outline'
 }
 
+const MessageSummary = ({ msg }: { msg: JetstreamEvent }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+
+  // Get a human readable summary based on the event type
+  const getSummary = () => {
+    if (msg.kind === 'commit') {
+      switch (msg.commit.collection) {
+        case 'app.bsky.feed.post':
+          return msg.commit.record?.$type === 'app.bsky.feed.post' && msg.commit.record.text
+            ? msg.commit.record.text.slice(0, 100) + (msg.commit.record.text.length > 100 ? '...' : '')
+            : 'Post'
+        case 'app.bsky.feed.repost':
+          return 'Repost'
+        case 'app.bsky.feed.like':
+          return 'Like'
+        case 'app.bsky.graph.follow':
+          return 'Follow'
+        case 'app.bsky.graph.block':
+          return 'Block'
+        default:
+          return msg.commit.collection.split('.').pop()
+      }
+    }
+    return msg.kind
+  }
+
+  return (
+    <div
+      className={`${getEventColor(msg)} h-16 rounded-md text-xs cursor-pointer transition-all overflow-hidden ${
+        isExpanded ? 'h-auto' : ''
+      }`}
+      onClick={() => setIsExpanded(!isExpanded)}
+    >
+      <div className="p-2">
+        <div className="flex items-center gap-2 justify-between">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge variant={getEventBadgeColor(msg)} className="flex items-center gap-1.5">
+              {msg.kind === 'commit' ? (
+                <>
+                  {getOperationIcon(msg.commit.operation)}
+                  {msg.commit.operation}
+                </>
+              ) : msg.kind === 'identity' ? (
+                <>
+                  <UserRound size={14} />
+                  {msg.kind}
+                </>
+              ) : (
+                <>
+                  <ShieldCheck size={14} />
+                  {msg.kind}
+                </>
+              )}
+            </Badge>
+            {msg.kind === 'commit' && (
+              <Badge variant="outline" className="flex items-center gap-1.5 font-mono">
+                {getCollectionIcon(msg.commit.collection)}
+                {msg.commit.collection.split('.').pop()}
+              </Badge>
+            )}
+            <span className="text-muted-foreground">
+              {new Date(Math.floor(msg.time_us / 1000)).toLocaleTimeString()}
+            </span>
+          </div>
+          <RecordLinks event={msg} />
+        </div>
+
+        <div className="mt-1 line-clamp-1 text-muted-foreground">{getSummary()}</div>
+
+        {isExpanded && (
+          <div className="mt-2 pt-2 border-t font-mono whitespace-pre-wrap break-all text-[10px]">
+            {JSON.stringify(msg, null, 2)}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function StreamViewer({ messages, filteredMessages }: StreamViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [lag, setLag] = useState<number | null>(null)
@@ -108,12 +187,12 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
 
   const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages
 
-  // Virtualizer setup
+  // Virtualizer setup with fixed height
   const virtualizer = useVirtualizer({
     count: displayMessages.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => 300, // Average height estimate
-    overscan: 5, // Pre-render 5 items above and below
+    estimateSize: () => 72, // 64px height + 8px margin
+    overscan: 5,
   })
 
   // Keep latest message time updated
@@ -214,7 +293,6 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
                 <div
                   key={virtualRow.key}
                   data-index={virtualRow.index}
-                  ref={virtualizer.measureElement}
                   style={{
                     position: 'absolute',
                     top: 0,
@@ -223,41 +301,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
-                  <div className={`${getEventColor(msg)} my-1 p-2 rounded-md text-xs`}>
-                    <div className={`flex items-center gap-2 mb-1 justify-between`}>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={getEventBadgeColor(msg)} className="flex items-center gap-1.5">
-                          {msg.kind === 'commit' ? (
-                            <>
-                              {getOperationIcon(msg.commit.operation)}
-                              {msg.commit.operation}
-                            </>
-                          ) : msg.kind === 'identity' ? (
-                            <>
-                              <UserRound size={14} />
-                              {msg.kind}
-                            </>
-                          ) : (
-                            <>
-                              <ShieldCheck size={14} />
-                              {msg.kind}
-                            </>
-                          )}
-                        </Badge>
-                        {msg.kind === 'commit' && (
-                          <Badge variant="outline" className="flex items-center gap-1.5 font-mono">
-                            {getCollectionIcon(msg.commit.collection)}
-                            {msg.commit.collection.split('.').pop()}
-                          </Badge>
-                        )}
-                        <span className="text-muted-foreground">
-                          {new Date(Math.floor(msg.time_us / 1000)).toLocaleTimeString()}
-                        </span>
-                      </div>
-                      <RecordLinks event={msg} />
-                    </div>
-                    <div className="font-mono whitespace-pre-wrap break-all">{JSON.stringify(msg, null, 2)}</div>
-                  </div>
+                  <MessageSummary msg={msg} />
                 </div>
               )
             })}
