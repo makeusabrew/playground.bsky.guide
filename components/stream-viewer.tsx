@@ -19,10 +19,15 @@ import {
   ScrollText,
   Eye,
   EyeOff,
+  ChevronRight,
+  Activity,
+  PlusCircle,
 } from 'lucide-react'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
 import { RecordLinks } from './record-links'
+import { format } from 'date-fns'
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from './ui/tooltip'
 
 interface StreamViewerProps {
   messages: JetstreamEvent[]
@@ -34,7 +39,7 @@ type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
 const getOperationIcon = (operation: string) => {
   switch (operation) {
     case 'create':
-      return <Plus size={14} />
+      return <PlusCircle size={14} />
     case 'update':
       return <Pencil size={14} />
     case 'delete':
@@ -99,25 +104,70 @@ const getEventBadgeColor = (event: JetstreamEvent): BadgeVariant => {
   return 'outline'
 }
 
-const MessageSummary = ({ msg }: { msg: JetstreamEvent }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+interface PostRecord {
+  $type: string
+  text?: string
+  embed?: {
+    $type: string
+    images?: Array<{
+      alt?: string
+      image: {
+        $type: string
+        ref: { $link: string }
+        mimeType: string
+      }
+    }>
+  }
+}
 
-  // Get a human readable summary based on the event type
+const MessageSummary = ({ msg, index }: { msg: JetstreamEvent; index: number }) => {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const messageRef = useRef<HTMLDivElement>(null)
+
+  // Enhanced summary with rich content
   const getSummary = () => {
     if (msg.kind === 'commit') {
       switch (msg.commit.collection) {
         case 'app.bsky.feed.post':
-          return msg.commit.record?.$type === 'app.bsky.feed.post' && msg.commit.record.text
-            ? msg.commit.record.text.slice(0, 100) + (msg.commit.record.text.length > 100 ? '...' : '')
-            : 'Post'
+          if (msg.commit.record?.$type === 'app.bsky.feed.post') {
+            const record = msg.commit.record as PostRecord
+            const text = record.text || ''
+            return (
+              <div className="flex flex-col gap-1">
+                <span>
+                  {text.slice(0, 100)}
+                  {text.length > 100 ? '...' : ''}
+                </span>
+                {record.embed?.images && (
+                  <span className="text-muted-foreground">
+                    📷 {record.embed.images.length} image{record.embed.images.length > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+            )
+          }
+          return 'Post'
         case 'app.bsky.feed.repost':
-          return 'Repost'
+          return (
+            <div className="flex items-center gap-1">
+              <Repeat size={12} className="text-muted-foreground" />
+              <span>Reposted a post</span>
+            </div>
+          )
         case 'app.bsky.feed.like':
-          return 'Like'
+          return (
+            <div className="flex items-center gap-1">
+              <Heart size={12} className="text-muted-foreground" />
+              <span>Liked a post</span>
+            </div>
+          )
         case 'app.bsky.graph.follow':
-          return 'Follow'
-        case 'app.bsky.graph.block':
-          return 'Block'
+          return (
+            <div className="flex items-center gap-1">
+              <Users size={12} className="text-muted-foreground" />
+              <span>Followed a user</span>
+            </div>
+          )
         default:
           return msg.commit.collection.split('.').pop()
       }
@@ -125,17 +175,43 @@ const MessageSummary = ({ msg }: { msg: JetstreamEvent }) => {
     return msg.kind
   }
 
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!messageRef.current?.contains(document.activeElement)) return
+
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        setIsExpanded(!isExpanded)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isExpanded])
+
   return (
     <div
-      className={`${getEventColor(msg)} h-16 rounded-md text-xs cursor-pointer transition-all overflow-hidden ${
+      ref={messageRef}
+      className={`group ${getEventColor(
+        msg
+      )} dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800/50 h-16 rounded-md text-xs transition-all overflow-hidden border border-border/50 ${
         isExpanded ? 'h-auto' : ''
       }`}
       onClick={() => setIsExpanded(!isExpanded)}
+      tabIndex={0}
+      role="button"
+      aria-expanded={isExpanded}
+      data-index={index}
     >
       <div className="p-2">
         <div className="flex items-center gap-2 justify-between">
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant={getEventBadgeColor(msg)} className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground tabular-nums">
+              {format(Math.floor(msg.time_us / 1000), 'HH:mm:ss.SSS')}
+            </span>
+            {/* Operation type */}
+            <div className="w-[60px] flex items-center gap-1.5 font-medium">
               {msg.kind === 'commit' ? (
                 <>
                   {getOperationIcon(msg.commit.operation)}
@@ -152,24 +228,32 @@ const MessageSummary = ({ msg }: { msg: JetstreamEvent }) => {
                   {msg.kind}
                 </>
               )}
-            </Badge>
+            </div>
+
+            {/* Collection type */}
             {msg.kind === 'commit' && (
-              <Badge variant="outline" className="flex items-center gap-1.5 font-mono">
+              <div className="w-[48px] flex items-center gap-1.5 text-muted-foreground">
                 {getCollectionIcon(msg.commit.collection)}
                 {msg.commit.collection.split('.').pop()}
-              </Badge>
+              </div>
             )}
-            <span className="text-muted-foreground">
-              {new Date(Math.floor(msg.time_us / 1000)).toLocaleTimeString()}
-            </span>
           </div>
-          <RecordLinks event={msg} />
+
+          <div className="flex items-center gap-2">
+            <RecordLinks event={msg} />
+            <ChevronRight
+              size={16}
+              className={`text-muted-foreground/50 transition-transform ${
+                isExpanded ? 'rotate-90' : ''
+              } opacity-100 group-hover:opacity-100`}
+            />
+          </div>
         </div>
 
-        <div className="mt-1 line-clamp-1 text-muted-foreground">{getSummary()}</div>
+        <div className="mt-2 text-muted-foreground">{getSummary()}</div>
 
         {isExpanded && (
-          <div className="mt-2 pt-2 border-t font-mono whitespace-pre-wrap break-all text-[10px]">
+          <div className="mt-3 pt-3 border-t font-mono whitespace-pre-wrap break-all text-[10px]">
             {JSON.stringify(msg, null, 2)}
           </div>
         )}
@@ -184,6 +268,9 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   const latestMessageTimeRef = useRef<number | null>(null)
   const [isViewFrozen, setIsViewFrozen] = useState(false)
   const frozenMessagesRef = useRef<JetstreamEvent[]>([])
+  const [velocity, setVelocity] = useState(0)
+  const lastMessageCountRef = useRef(0)
+  const lastUpdateTimeRef = useRef(Date.now())
 
   const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages
 
@@ -237,6 +324,19 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
     })
   }, [displayMessages, isViewFrozen, virtualizer])
 
+  // Calculate message velocity (messages per second)
+  useEffect(() => {
+    const now = Date.now()
+    const timeDiff = now - lastUpdateTimeRef.current
+    const messageDiff = filteredMessages.length - lastMessageCountRef.current
+
+    if (timeDiff >= 1000) {
+      setVelocity(Math.round((messageDiff / timeDiff) * 1000))
+      lastMessageCountRef.current = filteredMessages.length
+      lastUpdateTimeRef.current = now
+    }
+  }, [filteredMessages])
+
   const getLagStyles = (lagMs: number): string => {
     if (lagMs <= 1000) return 'bg-green-50'
     if (lagMs <= 3000) return 'bg-yellow-100'
@@ -252,6 +352,19 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
         <div className="flex items-center gap-2">
           <ScrollText size={16} className="text-muted-foreground hidden md:block" />
           <h2 className="font-semibold">Message stream</h2>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Badge variant="secondary" className="gap-1">
+                  <Activity size={12} />
+                  {velocity}/s
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Messages per second</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="flex items-center gap-1.5">
           <Button
@@ -301,7 +414,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
-                  <MessageSummary msg={msg} />
+                  <MessageSummary msg={msg} index={virtualRow.index} />
                 </div>
               )
             })}
