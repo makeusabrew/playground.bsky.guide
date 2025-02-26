@@ -106,8 +106,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   const [isViewFrozen, setIsViewFrozen] = useState(false)
   const frozenMessagesRef = useRef<JetstreamEvent[]>([])
 
-  // only render last 100 for our protection!
-  const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages.slice(-100)
+  const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages
 
   // Virtualizer setup
   const virtualizer = useVirtualizer({
@@ -115,10 +114,6 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
     getScrollElement: () => scrollRef.current,
     estimateSize: () => 300, // Average height estimate
     overscan: 5, // Pre-render 5 items above and below
-    measureElement: (element) => {
-      // Get actual height of rendered element
-      return element?.getBoundingClientRect().height || 300
-    },
   })
 
   // Keep latest message time updated
@@ -133,7 +128,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   // Store messages when freezing view
   const handleFreezeToggle = () => {
     if (!isViewFrozen) {
-      frozenMessagesRef.current = filteredMessages.slice(-100)
+      frozenMessagesRef.current = filteredMessages.slice()
     }
     setIsViewFrozen(!isViewFrozen)
   }
@@ -156,24 +151,11 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
 
   // Handle auto-scrolling and scroll lock in live mode
   useEffect(() => {
-    if (!scrollRef.current || isViewFrozen) return
+    if (isViewFrozen) return
 
-    const scrollElement = scrollRef.current
-    const totalSize = virtualizer.getTotalSize()
-
-    // Scroll to bottom in live mode
-    scrollElement.scrollTop = totalSize
-
-    if (!isViewFrozen) {
-      // Prevent scroll in live mode
-      const preventScroll = (e: WheelEvent) => {
-        e.preventDefault()
-        scrollElement.scrollTop = totalSize
-      }
-
-      scrollElement.addEventListener('wheel', preventScroll, { passive: false })
-      return () => scrollElement.removeEventListener('wheel', preventScroll)
-    }
+    virtualizer.scrollToIndex(displayMessages.length - 1, {
+      align: 'end',
+    })
   }, [displayMessages, isViewFrozen, virtualizer])
 
   const getLagStyles = (lagMs: number): string => {
@@ -240,41 +222,42 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
                     width: '100%',
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
-                  className={`text-xs rounded-md p-2 ${getEventColor(msg)}`}
                 >
-                  <div className="flex items-center gap-2 mb-1 justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={getEventBadgeColor(msg)} className="flex items-center gap-1.5">
-                        {msg.kind === 'commit' ? (
-                          <>
-                            {getOperationIcon(msg.commit.operation)}
-                            {msg.commit.operation}
-                          </>
-                        ) : msg.kind === 'identity' ? (
-                          <>
-                            <UserRound size={14} />
-                            {msg.kind}
-                          </>
-                        ) : (
-                          <>
-                            <ShieldCheck size={14} />
-                            {msg.kind}
-                          </>
-                        )}
-                      </Badge>
-                      {msg.kind === 'commit' && (
-                        <Badge variant="outline" className="flex items-center gap-1.5 font-mono">
-                          {getCollectionIcon(msg.commit.collection)}
-                          {msg.commit.collection.split('.').pop()}
+                  <div className={`${getEventColor(msg)} my-1 p-2 rounded-md text-xs`}>
+                    <div className={`flex items-center gap-2 mb-1 justify-between`}>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={getEventBadgeColor(msg)} className="flex items-center gap-1.5">
+                          {msg.kind === 'commit' ? (
+                            <>
+                              {getOperationIcon(msg.commit.operation)}
+                              {msg.commit.operation}
+                            </>
+                          ) : msg.kind === 'identity' ? (
+                            <>
+                              <UserRound size={14} />
+                              {msg.kind}
+                            </>
+                          ) : (
+                            <>
+                              <ShieldCheck size={14} />
+                              {msg.kind}
+                            </>
+                          )}
                         </Badge>
-                      )}
-                      <span className="text-muted-foreground">
-                        {new Date(Math.floor(msg.time_us / 1000)).toLocaleTimeString()}
-                      </span>
+                        {msg.kind === 'commit' && (
+                          <Badge variant="outline" className="flex items-center gap-1.5 font-mono">
+                            {getCollectionIcon(msg.commit.collection)}
+                            {msg.commit.collection.split('.').pop()}
+                          </Badge>
+                        )}
+                        <span className="text-muted-foreground">
+                          {new Date(Math.floor(msg.time_us / 1000)).toLocaleTimeString()}
+                        </span>
+                      </div>
+                      <RecordLinks event={msg} />
                     </div>
-                    <RecordLinks event={msg} />
+                    <div className="font-mono whitespace-pre-wrap break-all">{JSON.stringify(msg, null, 2)}</div>
                   </div>
-                  <div className="font-mono whitespace-pre-wrap break-all">{JSON.stringify(msg, null, 2)}</div>
                 </div>
               )
             })}
