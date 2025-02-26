@@ -21,7 +21,6 @@ import {
   EyeOff,
   ChevronRight,
   Activity,
-  PlusCircle,
 } from 'lucide-react'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
@@ -39,7 +38,7 @@ type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline'
 const getOperationIcon = (operation: string) => {
   switch (operation) {
     case 'create':
-      return <PlusCircle size={14} />
+      return <Plus size={14} />
     case 'update':
       return <Pencil size={14} />
     case 'delete':
@@ -86,24 +85,6 @@ const getEventColor = (event: JetstreamEvent) => {
   return 'bg-gray-500/10'
 }
 
-const getEventBadgeColor = (event: JetstreamEvent): BadgeVariant => {
-  if (event.kind === 'identity') return 'secondary'
-  if (event.kind === 'account') return 'secondary'
-  if (event.kind === 'commit') {
-    switch (event.commit.operation) {
-      case 'create':
-        return 'default'
-      case 'update':
-        return 'secondary'
-      case 'delete':
-        return 'destructive'
-      default:
-        return 'outline'
-    }
-  }
-  return 'outline'
-}
-
 interface PostRecord {
   $type: string
   text?: string
@@ -120,8 +101,17 @@ interface PostRecord {
   }
 }
 
-const MessageSummary = ({ msg, index }: { msg: JetstreamEvent; index: number }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+const MessageSummary = ({
+  msg,
+  index,
+  isExpanded,
+  onExpandChange,
+}: {
+  msg: JetstreamEvent
+  index: number
+  isExpanded: boolean
+  onExpandChange: (expanded: boolean) => void
+}) => {
   const messageRef = useRef<HTMLDivElement>(null)
 
   // Enhanced summary with rich content
@@ -182,13 +172,13 @@ const MessageSummary = ({ msg, index }: { msg: JetstreamEvent; index: number }) 
 
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
-        setIsExpanded(!isExpanded)
+        onExpandChange(!isExpanded)
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isExpanded])
+  }, [isExpanded, onExpandChange])
 
   return (
     <div
@@ -198,7 +188,7 @@ const MessageSummary = ({ msg, index }: { msg: JetstreamEvent; index: number }) 
       )} dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800/50 h-16 rounded-md text-xs transition-all overflow-hidden border border-border/50 ${
         isExpanded ? 'h-auto' : ''
       }`}
-      onClick={() => setIsExpanded(!isExpanded)}
+      onClick={() => onExpandChange(!isExpanded)}
       tabIndex={0}
       role="button"
       aria-expanded={isExpanded}
@@ -271,15 +261,17 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   const [velocity, setVelocity] = useState(0)
   const lastMessageCountRef = useRef(0)
   const lastUpdateTimeRef = useRef(Date.now())
+  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set())
 
   const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages
 
-  // Virtualizer setup with fixed height
+  // Virtualizer setup with dynamic height
   const virtualizer = useVirtualizer({
     count: displayMessages.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => 72, // 64px height + 8px margin
+    estimateSize: (index) => (expandedIndices.has(index) ? 300 : 72), // Expanded messages get more space
     overscan: 5,
+    getItemKey: (index) => `${displayMessages[index].time_us}-${index}`,
   })
 
   // Keep latest message time updated
@@ -346,6 +338,18 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
     return 'bg-red-500'
   }
 
+  const handleMessageExpand = (index: number, isExpanded: boolean) => {
+    setExpandedIndices((prev) => {
+      const next = new Set(prev)
+      if (isExpanded) {
+        next.add(index)
+      } else {
+        next.delete(index)
+      }
+      return next
+    })
+  }
+
   return (
     <Card className="h-[calc(100vh-100px)] flex flex-col">
       <div className="py-1.5 px-3 border-b flex-none flex items-center justify-between">
@@ -406,15 +410,23 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
                 <div
                   key={virtualRow.key}
                   data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
                   style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     width: '100%',
+                    height: 'auto',
                     transform: `translateY(${virtualRow.start}px)`,
+                    zIndex: expandedIndices.has(virtualRow.index) ? 10 : 'auto',
                   }}
                 >
-                  <MessageSummary msg={msg} index={virtualRow.index} />
+                  <MessageSummary
+                    msg={msg}
+                    index={virtualRow.index}
+                    isExpanded={expandedIndices.has(virtualRow.index)}
+                    onExpandChange={(expanded) => handleMessageExpand(virtualRow.index, expanded)}
+                  />
                 </div>
               )
             })}
