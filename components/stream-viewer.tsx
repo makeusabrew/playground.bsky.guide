@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { JetstreamEvent } from '@/lib/playground/jetstream/types'
 import { Badge } from './ui/badge'
 import {
@@ -108,9 +109,20 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   // only render last 100 for our protection!
   const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages.slice(-100)
 
+  // Virtualizer setup
+  const virtualizer = useVirtualizer({
+    count: displayMessages.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 300, // Average height estimate
+    overscan: 5, // Pre-render 5 items above and below
+    measureElement: (element) => {
+      // Get actual height of rendered element
+      return element?.getBoundingClientRect().height || 300
+    },
+  })
+
   // Keep latest message time updated
   useEffect(() => {
-    // Always update the latest message time from filtered messages, even when view is frozen
     if (filteredMessages.length > 0) {
       latestMessageTimeRef.current = Math.floor(filteredMessages[filteredMessages.length - 1].time_us / 1000)
     } else {
@@ -121,7 +133,6 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   // Store messages when freezing view
   const handleFreezeToggle = () => {
     if (!isViewFrozen) {
-      // When freezing, store current messages
       frozenMessagesRef.current = filteredMessages.slice(-100)
     }
     setIsViewFrozen(!isViewFrozen)
@@ -138,19 +149,32 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
       setLag(now - latestMessageTimeRef.current)
     }
 
-    // Initial update
     updateLag()
-
-    // Update every second
     const interval = setInterval(updateLag, 1000)
     return () => clearInterval(interval)
-  }, []) // No dependencies needed - we use the ref
+  }, [])
 
-  // Handle auto-scrolling - always scroll to bottom when live, allow manual scroll when frozen
+  // Handle auto-scrolling and scroll lock in live mode
   useEffect(() => {
-    if (isViewFrozen || !scrollRef.current) return
-    scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-  }, [displayMessages, isViewFrozen])
+    if (!scrollRef.current || isViewFrozen) return
+
+    const scrollElement = scrollRef.current
+    const totalSize = virtualizer.getTotalSize()
+
+    // Scroll to bottom in live mode
+    scrollElement.scrollTop = totalSize
+
+    if (!isViewFrozen) {
+      // Prevent scroll in live mode
+      const preventScroll = (e: WheelEvent) => {
+        e.preventDefault()
+        scrollElement.scrollTop = totalSize
+      }
+
+      scrollElement.addEventListener('wheel', preventScroll, { passive: false })
+      return () => scrollElement.removeEventListener('wheel', preventScroll)
+    }
+  }, [displayMessages, isViewFrozen, virtualizer])
 
   const getLagStyles = (lagMs: number): string => {
     if (lagMs <= 1000) return 'bg-green-50'
@@ -195,44 +219,65 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
             {messages.length === 0 ? 'Waiting for connection...' : 'No messages match the current filters'}
           </div>
         ) : (
-          <div className="space-y-2">
-            {displayMessages.map((msg, i) => (
-              <div key={i} className={`text-xs rounded-md p-2 ${getEventColor(msg)}`}>
-                <div className="flex items-center gap-2 mb-1 justify-between">
-                  <div className="flex items-center gap-2">
-                    <Badge variant={getEventBadgeColor(msg)} className="flex items-center gap-1.5">
-                      {msg.kind === 'commit' ? (
-                        <>
-                          {getOperationIcon(msg.commit.operation)}
-                          {msg.commit.operation}
-                        </>
-                      ) : msg.kind === 'identity' ? (
-                        <>
-                          <UserRound size={14} />
-                          {msg.kind}
-                        </>
-                      ) : (
-                        <>
-                          <ShieldCheck size={14} />
-                          {msg.kind}
-                        </>
-                      )}
-                    </Badge>
-                    {msg.kind === 'commit' && (
-                      <Badge variant="outline" className="flex items-center gap-1.5 font-mono">
-                        {getCollectionIcon(msg.commit.collection)}
-                        {msg.commit.collection.split('.').pop()}
+          <div
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative',
+            }}
+          >
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const msg = displayMessages[virtualRow.index]
+              return (
+                <div
+                  key={virtualRow.key}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                  className={`text-xs rounded-md p-2 ${getEventColor(msg)}`}
+                >
+                  <div className="flex items-center gap-2 mb-1 justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant={getEventBadgeColor(msg)} className="flex items-center gap-1.5">
+                        {msg.kind === 'commit' ? (
+                          <>
+                            {getOperationIcon(msg.commit.operation)}
+                            {msg.commit.operation}
+                          </>
+                        ) : msg.kind === 'identity' ? (
+                          <>
+                            <UserRound size={14} />
+                            {msg.kind}
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck size={14} />
+                            {msg.kind}
+                          </>
+                        )}
                       </Badge>
-                    )}
-                    <span className="text-muted-foreground">
-                      {new Date(Math.floor(msg.time_us / 1000)).toLocaleTimeString()}
-                    </span>
+                      {msg.kind === 'commit' && (
+                        <Badge variant="outline" className="flex items-center gap-1.5 font-mono">
+                          {getCollectionIcon(msg.commit.collection)}
+                          {msg.commit.collection.split('.').pop()}
+                        </Badge>
+                      )}
+                      <span className="text-muted-foreground">
+                        {new Date(Math.floor(msg.time_us / 1000)).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <RecordLinks event={msg} />
                   </div>
-                  <RecordLinks event={msg} />
+                  <div className="font-mono whitespace-pre-wrap break-all">{JSON.stringify(msg, null, 2)}</div>
                 </div>
-                <div className="font-mono whitespace-pre-wrap break-all">{JSON.stringify(msg, null, 2)}</div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
