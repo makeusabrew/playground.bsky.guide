@@ -272,29 +272,18 @@ export default function StreamViewer({ filteredMessages }: StreamViewerProps) {
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
-                  <div className="grid grid-cols-[6rem_1rem_4rem_1fr_4rem] gap-3 px-4 py-2.5 items-center h-full">
-                    <div className="font-mono text-xs text-muted-foreground truncate">
+                  <div className="grid grid-cols-[7rem_4rem_1fr_4rem] gap-5 px-3 py-2.5 items-center h-full">
+                    <div className="font-mono text-xs text-muted-foreground truncate flex items-center gap-2">
+                      <div className="text-muted-foreground">
+                        {msg.kind === 'commit' ? (
+                          getOperationIcon(msg.commit.operation)
+                        ) : msg.kind === 'identity' ? (
+                          <UserRound size={14} />
+                        ) : (
+                          <ShieldCheck size={14} />
+                        )}
+                      </div>
                       {format(Math.floor(msg.time_us / 1000), 'HH:mm:ss.SSS')}
-                    </div>
-                    <div className="flex justify-center">
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <div className="text-muted-foreground">
-                              {msg.kind === 'commit' ? (
-                                getOperationIcon(msg.commit.operation)
-                              ) : msg.kind === 'identity' ? (
-                                <UserRound size={14} />
-                              ) : (
-                                <ShieldCheck size={14} />
-                              )}
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            {msg.kind === 'commit' ? msg.commit.operation : msg.kind}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
                     </div>
                     <div>
                       {msg.kind === 'commit' && (
