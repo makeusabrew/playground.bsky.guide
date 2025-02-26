@@ -19,9 +19,7 @@ import {
   ScrollText,
   Eye,
   EyeOff,
-  ChevronRight,
   Activity,
-  X,
 } from 'lucide-react'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
@@ -30,7 +28,6 @@ import { format } from 'date-fns'
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from './ui/tooltip'
 
 interface StreamViewerProps {
-  messages: JetstreamEvent[]
   filteredMessages: JetstreamEvent[]
 }
 
@@ -100,198 +97,31 @@ interface PostRecord {
   }
 }
 
-const ExpandedMessage = ({ msg, onClose }: { msg: JetstreamEvent; onClose: () => void }) => {
-  return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
-    >
-      <div
-        className={`relative w-[90%] max-w-3xl max-h-[90vh] overflow-auto rounded-lg ${getEventColor(
-          msg
-        )} dark:bg-slate-900 p-4 border border-border/50`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800"
-        >
-          <X size={16} />
-        </button>
-        <div className="font-mono whitespace-pre-wrap break-all text-[10px] mt-4">{JSON.stringify(msg, null, 2)}</div>
-      </div>
-    </div>
-  )
-}
-
-const MessageSummary = ({
-  msg,
-  index,
-  isExpanded,
-  onExpandChange,
-}: {
-  msg: JetstreamEvent
-  index: number
-  isExpanded: boolean
-  onExpandChange: (expanded: boolean) => void
-}) => {
-  const messageRef = useRef<HTMLDivElement>(null)
-
-  // Enhanced summary with rich content
-  const getSummary = () => {
-    if (msg.kind === 'commit') {
-      switch (msg.commit.collection) {
-        case 'app.bsky.feed.post':
-          if (msg.commit.record?.$type === 'app.bsky.feed.post') {
-            const record = msg.commit.record as PostRecord
-            const text = record.text || ''
-            return (
-              <div className="flex flex-col gap-1">
-                <span>
-                  {text.slice(0, 100)}
-                  {text.length > 100 ? '...' : ''}
-                </span>
-                {record.embed?.images && (
-                  <span className="text-muted-foreground">
-                    📷 {record.embed.images.length} image{record.embed.images.length > 1 ? 's' : ''}
-                  </span>
-                )}
-              </div>
-            )
-          }
-          return 'Post'
-        case 'app.bsky.feed.repost':
-          return (
-            <div className="flex items-center gap-1">
-              <Repeat size={12} className="text-muted-foreground" />
-              <span>Reposted a post</span>
-            </div>
-          )
-        case 'app.bsky.feed.like':
-          return (
-            <div className="flex items-center gap-1">
-              <Heart size={12} className="text-muted-foreground" />
-              <span>Liked a post</span>
-            </div>
-          )
-        case 'app.bsky.graph.follow':
-          return (
-            <div className="flex items-center gap-1">
-              <Users size={12} className="text-muted-foreground" />
-              <span>Followed a user</span>
-            </div>
-          )
-        default:
-          return msg.commit.collection.split('.').pop()
-      }
+const getMessageSummary = (msg: JetstreamEvent) => {
+  if (msg.kind === 'commit') {
+    if (msg.commit.operation === 'delete') return ''
+    switch (msg.commit.collection) {
+      case 'app.bsky.feed.post':
+        if (msg.commit.record?.$type === 'app.bsky.feed.post') {
+          const record = msg.commit.record as PostRecord
+          const text = record.text || ''
+          return text.length > 100 ? `${text.slice(0, 100)}...` : text
+        }
+        return 'Post'
+      case 'app.bsky.feed.repost':
+        return 'Reposted a post'
+      case 'app.bsky.feed.like':
+        return 'Liked a post'
+      case 'app.bsky.graph.follow':
+        return 'Followed a user'
+      default:
+        return msg.commit.collection.split('.').pop()
     }
-    return msg.kind
   }
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!messageRef.current?.contains(document.activeElement)) return
-
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault()
-        onExpandChange(!isExpanded)
-      }
-      if (e.key === 'Escape' && isExpanded) {
-        e.preventDefault()
-        onExpandChange(false)
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isExpanded, onExpandChange])
-
-  return (
-    <div className="relative">
-      <div
-        ref={messageRef}
-        className={`group ${getEventColor(
-          msg
-        )} dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800/50 h-16 rounded-md text-xs transition-all overflow-hidden border border-border/50`}
-        onClick={() => onExpandChange(!isExpanded)}
-        tabIndex={0}
-        role="button"
-        aria-expanded={isExpanded}
-        data-index={index}
-      >
-        <div className="p-2">
-          <div className="flex items-center gap-2 justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-muted-foreground tabular-nums">
-                {format(Math.floor(msg.time_us / 1000), 'HH:mm:ss.SSS')}
-              </span>
-              {/* Operation type */}
-              <div className="w-[60px] flex items-center gap-1.5 font-medium">
-                {msg.kind === 'commit' ? (
-                  <>
-                    {getOperationIcon(msg.commit.operation)}
-                    {msg.commit.operation}
-                  </>
-                ) : msg.kind === 'identity' ? (
-                  <>
-                    <UserRound size={14} />
-                    {msg.kind}
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheck size={14} />
-                    {msg.kind}
-                  </>
-                )}
-              </div>
-
-              {/* Collection type */}
-              {msg.kind === 'commit' && (
-                <div className="w-[48px] flex items-center gap-1.5 text-muted-foreground">
-                  {getCollectionIcon(msg.commit.collection)}
-                  {msg.commit.collection.split('.').pop()}
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <RecordLinks event={msg} />
-              <ChevronRight
-                size={16}
-                className={`text-muted-foreground/50 transition-transform ${
-                  isExpanded ? 'rotate-90' : ''
-                } opacity-100 group-hover:opacity-100`}
-              />
-            </div>
-          </div>
-
-          <div className="mt-2 text-muted-foreground">{getSummary()}</div>
-        </div>
-      </div>
-
-      {isExpanded && (
-        <div
-          className={`absolute left-0 right-0 z-50 mt-1 rounded-lg ${getEventColor(
-            msg
-          )} dark:bg-slate-900/95 bg-opacity-95 backdrop-blur-sm p-4 border border-border/50 shadow-lg`}
-        >
-          <button
-            onClick={() => onExpandChange(false)}
-            className="absolute top-2 right-2 p-1 rounded-md hover:bg-slate-200 dark:hover:bg-slate-800"
-          >
-            <X size={16} />
-          </button>
-          <div className="font-mono whitespace-pre-wrap break-all text-[10px] mt-4">{JSON.stringify(msg, null, 2)}</div>
-        </div>
-      )}
-    </div>
-  )
+  return msg.kind
 }
 
-export default function StreamViewer({ messages, filteredMessages }: StreamViewerProps) {
+export default function StreamViewer({ filteredMessages }: StreamViewerProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [lag, setLag] = useState<number | null>(null)
   const latestMessageTimeRef = useRef<number | null>(null)
@@ -300,17 +130,15 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
   const [velocity, setVelocity] = useState(0)
   const lastMessageCountRef = useRef(0)
   const lastUpdateTimeRef = useRef(Date.now())
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
 
   const displayMessages = isViewFrozen ? frozenMessagesRef.current : filteredMessages
 
-  // Virtualizer setup with fixed height
+  // Virtualizer setup with fixed height for table rows
   const virtualizer = useVirtualizer({
     count: displayMessages.length,
     getScrollElement: () => scrollRef.current,
-    estimateSize: () => 64, // Back to fixed height since expanded view is in an overlay
+    estimateSize: () => 40, // Height of a table row
     overscan: 5,
-    gap: 10,
   })
 
   // Keep latest message time updated
@@ -346,7 +174,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
     return () => clearInterval(interval)
   }, [])
 
-  // Handle auto-scrolling and scroll lock in live mode
+  // Handle auto-scrolling
   useEffect(() => {
     if (isViewFrozen) return
 
@@ -355,7 +183,7 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
     })
   }, [displayMessages, isViewFrozen, virtualizer])
 
-  // Calculate message velocity (messages per second)
+  // Calculate message velocity
   useEffect(() => {
     const now = Date.now()
     const timeDiff = now - lastUpdateTimeRef.current
@@ -375,10 +203,6 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
     if (lagMs <= 10000) return 'bg-orange-300'
     if (lagMs <= 60000) return 'bg-red-300'
     return 'bg-red-500'
-  }
-
-  const handleMessageExpand = (index: number, isExpanded: boolean) => {
-    setExpandedIndex(isExpanded ? index : null)
   }
 
   return (
@@ -422,44 +246,74 @@ export default function StreamViewer({ messages, filteredMessages }: StreamViewe
         </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-3">
-        {displayMessages.length === 0 ? (
-          <div className="text-xs text-muted-foreground">
-            {messages.length === 0 ? 'Waiting for connection...' : 'No messages match the current filters'}
-          </div>
-        ) : (
-          <div
-            style={{
-              height: `${virtualizer.getTotalSize()}px`,
-              width: '100%',
-              position: 'relative',
-            }}
-          >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        <div className="min-w-full">
+          {/* Header */}
+          {/* <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 border-b">
+            <div className="grid grid-cols-[8rem_6rem_8rem_1fr_6rem] gap-3 px-4 py-3 text-sm font-medium text-muted-foreground">
+              <div>Timestamp</div>
+              <div>Operation</div>
+              <div>Collection</div>
+              <div>Content</div>
+              <div className="text-right">Actions</div>
+            </div>
+          </div> */}
+
+          {/* Virtualized Rows */}
+          <div style={{ height: `${virtualizer.getTotalSize()}px`, position: 'relative' }}>
             {virtualizer.getVirtualItems().map((virtualRow) => {
               const msg = displayMessages[virtualRow.index]
               return (
                 <div
                   key={virtualRow.key}
-                  data-index={virtualRow.index}
+                  className={`${getEventColor(msg)} transition-colors absolute w-full border-b`}
                   style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
+                    height: `${virtualRow.size}px`,
                     transform: `translateY(${virtualRow.start}px)`,
                   }}
                 >
-                  <MessageSummary
-                    msg={msg}
-                    index={virtualRow.index}
-                    isExpanded={expandedIndex === virtualRow.index}
-                    onExpandChange={(expanded) => handleMessageExpand(virtualRow.index, expanded)}
-                  />
+                  <div className="grid grid-cols-[6rem_4rem_4rem_1fr_4rem] gap-3 px-4 py-2.5 items-center h-full">
+                    <div className="font-mono text-xs text-muted-foreground truncate">
+                      {format(Math.floor(msg.time_us / 1000), 'HH:mm:ss.SSS')}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 text-xs">
+                        {msg.kind === 'commit' ? (
+                          <>
+                            {getOperationIcon(msg.commit.operation)}
+                            {msg.commit.operation}
+                          </>
+                        ) : msg.kind === 'identity' ? (
+                          <>
+                            <UserRound size={14} />
+                            {msg.kind}
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck size={14} />
+                            {msg.kind}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      {msg.kind === 'commit' && (
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          {getCollectionIcon(msg.commit.collection)}
+                          {msg.commit.collection.split('.').pop()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground truncate">{getMessageSummary(msg)}</div>
+                    <div className="text-right">
+                      <RecordLinks event={msg} />
+                    </div>
+                  </div>
                 </div>
               )
             })}
           </div>
-        )}
+        </div>
       </div>
     </Card>
   )
