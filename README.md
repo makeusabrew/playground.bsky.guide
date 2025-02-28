@@ -29,6 +29,18 @@ npm run dev
 
 Then open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Contributing
+
+Contributions are very welcome! Whether it's:
+
+- Reporting a bug
+- Discussing the current state of the code
+- Submitting a fix
+- Proposing new features
+- Improving documentation
+
+Please feel free to open an issue or submit a pull request. All contributions, big or small, make a difference!
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0.
