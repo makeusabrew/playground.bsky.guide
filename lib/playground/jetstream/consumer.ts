@@ -10,6 +10,13 @@ type ConsumerOptions = {
   onMessage: (event: JetstreamEvent) => void
   onError?: (error: Error) => void
   onStateChange?: (state: ConsumerState) => void
+  onNetworkEvent?: (event: {
+    type: 'websocket' | 'http'
+    action: string
+    details?: string
+    status?: 'success' | 'error' | 'pending'
+    url?: string
+  }) => string | void
 }
 
 type ConsumerState = {
@@ -82,6 +89,7 @@ export const createJetstreamConsumer = (options: ConsumerOptions) => {
         options.onError?.(error)
       }
     },
+    onNetworkEvent: options.onNetworkEvent,
   })
 
   const start = () => {

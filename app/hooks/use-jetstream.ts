@@ -7,6 +7,13 @@ type JetstreamStatus = 'disconnected' | 'connecting' | 'connected' | 'paused'
 
 type UseJetstreamOptions = JetstreamConfig & {
   onMessage?: (event: JetstreamEvent) => void
+  onNetworkEvent?: (event: {
+    type: 'websocket' | 'http'
+    action: string
+    details?: string
+    status?: 'success' | 'error' | 'pending'
+    url?: string
+  }) => string | void
 }
 
 export const useJetstream = (options: UseJetstreamOptions) => {
@@ -47,6 +54,7 @@ export const useJetstream = (options: UseJetstreamOptions) => {
       setStatus(state.status)
       setError(state.error)
     },
+    onNetworkEvent: options.onNetworkEvent,
   })
 
   const connect = useCallback(() => {

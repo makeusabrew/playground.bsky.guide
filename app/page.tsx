@@ -1,15 +1,16 @@
 'use client'
 import ConnectionConfig from '@/components/connection-config'
 import StreamViewer from '@/components/stream-viewer'
-import MetricsDisplay from '@/components/metrics-display'
 import { ConnectionString } from '@/components/connection-string'
 import { Card } from '@/components/ui/card'
-import LiveFilters from '@/components/live-filters'
+import { NetworkActivityOverlay } from '@/components/network-activity-overlay'
+import { SidebarTabs } from '@/components/sidebar-tabs'
 import { useMetrics } from './hooks/use-metrics'
 /* import { useShimmer } from './hooks/use-shimmer' */
 import { useConnection } from './hooks/use-connection'
 import { useFilters } from './hooks/use-filters'
 import { useJetstream } from './hooks/use-jetstream'
+import { useNetworkActivity } from './hooks/use-network-activity'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
@@ -17,9 +18,14 @@ export default function Home() {
   const { metrics, onMessage } = useMetrics()
   const [hasEverConnected, setHasEverConnected] = useState(false)
   const { connectionState, setConnectionState, connectionOptions, setConnectionOptions } = useConnection()
-  const jetstream = useJetstream({ ...connectionOptions, onMessage })
+  const { events: networkEvents, addEvent: addNetworkEvent } = useNetworkActivity(100)
+  const jetstream = useJetstream({
+    ...connectionOptions,
+    onMessage,
+    onNetworkEvent: (event) => addNetworkEvent(event),
+  })
   const messages = jetstream.messages
-  const { filters, setFilters, filteredMessages } = useFilters(messages)
+  const { filters, setFilters, propertyFilters, setPropertyFilters, filteredMessages } = useFilters(messages)
 
   // Handle connection state changes
   useEffect(() => {
@@ -72,6 +78,7 @@ export default function Home() {
                   </div>
                 </div>
               </Card>
+
               <Card>
                 <ConnectionConfig
                   connectionState={connectionState}
@@ -90,17 +97,22 @@ export default function Home() {
             <div className="md:col-span-6">
               <StreamViewer messages={messages} filteredMessages={filteredMessages} />
             </div>
-            <div className="md:col-span-3 space-y-5">
-              <Card>
-                <LiveFilters filters={filters} onFiltersChange={setFilters} disabled={!connectionState.connected} />
-              </Card>
-              <Card>
-                <MetricsDisplay metrics={metrics} />
-              </Card>
+            <div className="md:col-span-3">
+              <SidebarTabs
+                filters={filters}
+                onFiltersChange={setFilters}
+                propertyFilters={propertyFilters}
+                onPropertyFiltersChange={setPropertyFilters}
+                metrics={metrics}
+                disabled={!connectionState.connected}
+              />
             </div>
           </div>
         </div>
       </div>
+
+      {/* Network activity overlay */}
+      <NetworkActivityOverlay events={networkEvents} />
     </main>
   )
 }
